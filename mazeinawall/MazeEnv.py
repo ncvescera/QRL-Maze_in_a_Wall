@@ -1,6 +1,7 @@
 import numpy as np
 import gym
 from gym import spaces
+from Maze import Maze
 
 
 class MazeEnv(gym.Env):
@@ -23,30 +24,28 @@ class MazeEnv(gym.Env):
         self.m = m
         self.n = n
         # Size of the 1D-grid
-        self.grid_size = m*n
+        self.grid_size = n*m
         # Initialize the agent at the right of the grid
         self.agent_pos = {"x": 0, "y": 0}
         self.goal = {"x": n-1, "y": m-1}
 
-        print(self.goal)
-
-        self.mondo = np.zeros((self.n, self.m))
-        self.mondo[self.agent_pos["x"]][self.agent_pos["y"]] = self.AGENT
+        self.mondo = Maze(n, m)
+        self.actions = self.mondo.actions
 
         # Define action and observation space
         # They must be gym.spaces objects
         # Example when using discrete actions, we have two: left and right
         # n_actions = 2
-        n_actions = 4
+        n_actions = len(self.actions.keys())
         self.action_space = spaces.Discrete(n_actions)
         # The observation will be the coordinate of the agent
         # this can be described both by Discrete and Box space
         self.observation_space = spaces.Box(
             # low=(0, 0),
             # high=(n-1, m-1),
-            low=0,
-            high=self.grid_size,
-            shape=(n, m),   # TODO: ricontrollare
+            low=0,                  # TODO: ricontrollare meglio, potrebbe essere 2x2
+            high=self.grid_size,    # TODO: ricontrollare meglio, potrebbe essere 4x4 (la massima dimensione del vicinato di moore)
+            shape=(n, m),   # TODO: ricontrollare, alcuni la omettono
             dtype=np.int32  # TODO: potrebbe essere uint32
         )
 
