@@ -1,5 +1,5 @@
 class CommonElements:
-    __ACTIONS_VALUES = ["N", "S", "E", "W"]
+    __ACTIONS_VALUES = [0, 1, 2, 3]
     __ACTIONS_NAMES = ["up", "down", "right", "left"]
 
     @staticmethod

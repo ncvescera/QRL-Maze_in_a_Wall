@@ -20,7 +20,7 @@ class Maze:
 
             self.maze[y][x] = self.items["wall"]
 
-    def moore(self, pos: tuple[int, int]):
+    def moore(self, pos: tuple[int, int]) -> np.array:
         # pos = (x_val, y_val)
         x, y = pos
         vicini = np.zeros((3, 3), dtype=np.int32)
