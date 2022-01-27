@@ -71,7 +71,16 @@ class GridWorld(object):
 
         return state in self.stateGoals
 
-    def get_agent_row_column(self, new_state=None):
+    def get_agent_row_column(self, new_state: int = None):
+        """
+        Ritorna le coordinate x, y della posizione dell'agente se new_state è None,
+        altrimenti ritorna le coordinate x, y della posizione nuova dell'agente in new_state
+
+        :param new_state: nuovo stato dell'agente
+        :return: coordinate x, y della posizione dell'agente
+        """
+
+        # TODO: andrebbe commentato e capito che calcolo viene effettuato
         if new_state is None:
             x = self.agentPosition // self.m
             y = self.agentPosition % self.n
