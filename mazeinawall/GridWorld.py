@@ -1,57 +1,74 @@
-from os import lseek
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 
 
 class GridWorld(object):
-    def __init__(self, m=9, n=9, walls=10):
-        np.random.seed(22)                 # seed per la generazioni delle mura
+    def __init__(self, m=9, n=9, walls=10, grid=None):
+        # sezione per la generazione dei seed
+        np.random.seed(22)
         random.seed(22)
-        
-        self.grid = np.array([[0, 1, 1, 0, 0, 0, 0, 0, 0],
-                              [0, 1, 0, 0, 0, 0, 0, 0, 0],
-                              [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                              [1, 1, 0, 0, 1, 1, 0, 1, 0],
-                              [1, 1, 0, 0, 1, 0, 0, 0, 0],
-                              [1, 1, 1, 1, 1, 0, 0, 0, 0],
-                              [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                              [1, 1, 1, 1, 1, 1, 1, 0, 0],
-                              [1, 1, 1, 1, 1, 1, 1, 1, 0]])
-        
+
+        # dimensione matrice
         self.m = m
         self.n = n
+
+        if grid is not None:
+            self.grid = grid
+            self.m, self.n = self.grid.shape
+        else:
+            self.grid = self.generate_grid(walls)
+
+        # definizione cella goal
         self.goal = (self.m * self.n) - 1
-        # self.grid = self.generate_grid(walls)
-        self.reward = 0
-        # self.stateSpace = [i for i in range(self.m*self.n)]
-        self.stateSpace = [i for i in range(16)]
+
+        # definizione spazio degli stati e goal
+        self.stateSpace = [i for i in range(16)]  # TODO: capire perche 16
         self.stateGoals = [self.goal]
 
+        # definizione delle azioni possibili e spazio delle azioni
+        # TODO: commentare meglio
         self.actionSpace = {'U': -self.m, 'D': self.m, 'L': -1, 'R': 1}
         self.possibleActions = ['U', 'D', 'L', 'R']
-        
+
+        # posizione dell'agente e stato iniziale
         self.agentPosition = 0
         self.set_state(self.agentPosition)
 
-    def generate_grid(self, walls=10):
-        grid = np.zeros((self.m, self.n))
+        # init del reward, sarà cambiato in seguito
+        self.reward = 0
+
+    def generate_grid(self, walls=10) -> np.ndarray:
+        """
+        Genera una matrice di dimensione m x n con un numero di muri pari a walls.
+        Fa attenzione a non posizionare muri nella cella goa le start.
+        :param walls: numero di muri da inserire nella matrice  # TODO: rendere una percentuale
+        :return: matrice di dimensione m x n con muri
+        """
+        grid = np.zeros((self.m, self.n))  # matrice piena di 0
 
         for _ in range(walls):
+            # genera a caso una posizione dove inserire il muro
             x = random.randint(0, self.m - 1)
             y = random.randint(0, self.n - 1)
 
-            while x == 0 and y == 0 or x == self.goal and y == self.goal:
+            # se la cella scelta è il goal o lo stato iniziale la rigenera
+            # while x == 0 and y == 0 or x == self.goal and y == self.goal:
+            while x == 0 and y == 0 or x == (self.m - 1) and y == (self.n - 1):
                 x = random.randint(0, self.m - 1)
                 y = random.randint(0, self.n - 1)
 
-            grid[x][y] = 1
+            grid[x][y] = 1  # aggiunge il muro
 
         return grid
 
-    def is_terminal_state(self, state):  #  goal state
+    def is_terminal_state(self, state) -> bool:
+        """
+        Controlla se il stato passato è uno stato finale
+        :param state: stato da controllare
+        :return: True se è uno stato finale, False altrimenti
+        """
         return state in self.stateGoals
- 
+
     def get_agent_row_column(self, new_state=None):
         if new_state is None:
             x = self.agentPosition // self.m
@@ -65,18 +82,18 @@ class GridWorld(object):
             return x, y
 
     def set_state(self, state):
-        #x, y = self.get_agent_row_column()
-        #self.grid[x][y] = 0
         self.agentPosition = state
-        #x, y = self.get_agent_row_column()
-        #self.grid[x][y] = 1
 
-    def off_grid_move(self, new_state, old_state):
-        # if we move into a row not in the grid
-        #if new_state not in self.stateSpace:
-        if new_state not in range(self.n*self.m):
+    def off_grid_move(self, new_state, old_state) -> bool:
+        """
+        Controlla se il nuovo stato è fuori dalla griglia
+        :param new_state: nuovo stato da controllare
+        :param old_state: stato precedente alla mossa
+        :return: True se è fuori dalla griglia, False altrimenti
+        """
+        # TODO: ricontrollare
+        if new_state not in range(self.n * self.m):  # se il nuovo stato non appartiene agli stati
             return True
-        # if we're trying to wrap around to next row
         elif old_state % self.m == 0 and new_state % self.m == self.m - 1:
             return True
         elif old_state % self.m == self.m - 1 and new_state % self.m == 0:
@@ -84,142 +101,243 @@ class GridWorld(object):
         else:
             return False
 
-    def is_wall_colliding(self, new_state):
-        x, y = self.get_agent_row_column(new_state)
-        if self.grid[x][y] == 1:
+    def is_wall_colliding(self, new_state) -> bool:
+        """
+        Controlla se sta cercando di andare contro un muro
+        :param new_state: nuovo stato da controllare
+        :return: True se sta cercando di andare contro un muro, False altrimenti
+        """
+        x, y = self.get_agent_row_column(new_state)  # prende la nuova posizione dell'agente
+
+        if self.grid[x][y] == 1:  # controlla se l'agente si troverà su un muro
             return True
         else:
             return False
 
-    def getState(self,  nextPosition = "default"):
+    def get_state(self, next_position: int = "default") -> np.array:    # TODO: potrebbe dare errore il typing
+        """
+        Ottiene lo stato dell'agente. Se next_position è diverso da "default", ottiene il nuovo stato dell'agente.
+        Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
+            Dove :
+                [0] -> posizione sopra l'agente (UP)
+                [1] -> posizione a sinistra l'agente (LEFT)
+                [2] -> posizione a destra dell'agente (RIGHT)
+                [3] -> posizione sotto all'agente (DOWN)
+        In sostanza il vicinato di Von Neumann.
+                    0
+                1   A   2
+                    3
 
-        if nextPosition != "default":
-            x, y = self.get_agent_row_column(nextPosition)
-            # x = nextPosition // self.m
-            # y = nextPosition % self.n
+        :param next_position: nuova posizione dell'agente
+        :return: stato dell'agente/osservazione
+        """
+        # TODO: vedere se si puo' cambiare default con None
+        if next_position != "default":
+            x, y = self.get_agent_row_column(next_position)
         else:
             x, y = self.get_agent_row_column()
 
-        #print(x,y)
-
+        # TODO: comprendere questi calcoli
         if x > 0:
-            a = self.grid[x-1][y]
+            a = self.grid[x - 1][y]
         else:
             a = 1
 
         if y > 0:
-            b = self.grid[x][y-1]
+            b = self.grid[x][y - 1]
         else:
             b = 1
 
-        #c = self.grid[x][y]
-        
         if y < self.n - 1:
-            d = self.grid[x][y+1]
+            d = self.grid[x][y + 1]
         else:
             d = 1
-        
+
         if x < self.m - 1:
-            e = self.grid[x+1][y]
+            e = self.grid[x + 1][y]
         else:
             e = 1
+        ###
 
-        #print("--------------------")
-        #print(a)
-        #print(b)
-        #print(c)
-        #print(d)
-        #print(e)
-        #print("--------------------")
-        
-        state = np.array([a,b,d,e])
-        # print(state)
-        #print(state)
-        
+        state = np.array([a, b, d, e])  # stato da ritornare
+
         return state
 
-    def state_to_int(self, state):
+    def state_to_int(self, state: np.array) -> int:  # TODO: forse può essere STATIC
+        """
+        Converte lo stato (array) in un intero.
+        Sostanzialmente mappa uno stato a un numero.
+        :param state: stato da convertire
+        :return: intero rappresentante lo stato
+        """
         result = 0
         for i in range(len(state)):
             # mettere anche se uguale a 3
             if state[i] == 1:
-                result += 2**(i)
+                result += 2 ** i  # TODO: forse era 2 ** (i + 1)
         return result
 
-    def calculate_next_state(self, action, nextPosition):
-        state = self.getState()
-        #print(nextPosition)
-        # state[0] -> U
-        # state[1] -> R
-        # state[2] -> D
-        # state[3] -> L
-        # controllo azione eseguita, e in base ad essa ritorno lo stato ottenuto
+    def calculate_next_state(self, action, next_position) -> int:
+        # TODO: ricontrollare meglio la faccenda
+        """
+        Calcola il nuovo stato dell'agente in base all'azione e alla nuova posizione.
+        In base all'azione calcola anche il reward.
+
+        Ricordo che state è un array del tipo [0, 1, 1, 0].
+            Dove :
+                [0] -> posizione sopra l'agente (UP)
+                [1] -> posizione a sinistra l'agente (LEFT)
+                [2] -> posizione a destra dell'agente (RIGHT)
+                [3] -> posizione sotto all'agente (DOWN)
+
+        :param action: azione che ha eseguito l'agente
+        :param next_position: nuova posizione dove si troverà l'agente
+        :return: intero che rappresenta lo stato
+        """
+
+        # TODO: se funziona va a sostiuitre is_wall_colliding
+        def tmp_collaiding(cell):
+            if cell == 1:
+                return True
+            else:
+                return False
+
+        state = self.get_state()        # ottento lo stato attuale dell'agente
+
+        to_return = None                # valore da ritornare alla fine
+        update_agent_position = True    # controllo se aggiornare la posizione dell'agente
+
+
+
+        # TODO: commentare se va, senno rimettere come prima
+        if self.off_grid_move(next_position, self.agentPosition):
+            update_agent_position = False
+            self.reward = -5
+            to_return = self.state_to_int(state)
+        else:
+            # reward e risultato uguali per tutti se non impatta contro un muro
+            self.reward = 10 if self.is_terminal_state(next_position) else -1
+            to_return = self.state_to_int(self.get_state(next_position))
+
+            # controllo se impatta contro un muro: se si, ritorno lo stato corrente e reward -5
+            # "ritorno lo stato corrente" = l'agente non si muove e ha un reward di -5 (azione male male)
+            # TODO: si dovrebbe poter usare is_wall_colliding
+            if action == 'U':
+                if tmp_collaiding(state[0]):
+                    update_agent_position = False
+                    self.reward = -5
+                    to_return = self.state_to_int(state)
+            elif action == 'D':
+                if tmp_collaiding(state[3]):
+                    update_agent_position = False
+                    self.reward = -5
+                    to_return = self.state_to_int(state)
+            elif action == 'L':
+                if state[1] == 1:
+                    update_agent_position = False
+                    self.reward = -5
+                    return self.state_to_int(state)
+            elif action == 'R':
+                if state[2] == 1:
+                    update_agent_position = False
+                    self.reward = -5
+                    return self.state_to_int(state)
+
+            if update_agent_position:
+                self.agentPosition = next_position
+
+        return to_return
+
+        """
         if action == 'U':
             if state[0] == 1:
                 self.reward = -5
-                return self.state_to_int(state)
+                to_return = self.state_to_int(state)
+                # return self.state_to_int(state)
             else:
-                self.agentPosition = nextPosition
-                self.reward = 10 if self.is_terminal_state(nextPosition) else -1
-                return self.state_to_int(self.getState(nextPosition))
+                self.agentPosition = next_position
+                self.reward = 10 if self.is_terminal_state(next_position) else -1
+                return self.state_to_int(self.get_state(next_position))
         elif action == 'D':
             if state[3] == 1:
                 self.reward = -5
                 return self.state_to_int(state)
             else:
-                self.agentPosition = nextPosition
-                self.reward = 10 if self.is_terminal_state(nextPosition) else -1
-                return self.state_to_int(self.getState(nextPosition))
+                self.agentPosition = next_position
+                self.reward = 10 if self.is_terminal_state(next_position) else -1
+                return self.state_to_int(self.get_state(next_position))
         elif action == 'L':
             if state[1] == 1:
                 self.reward = -5
                 return self.state_to_int(state)
             else:
-                self.agentPosition = nextPosition
-                self.reward = 10 if self.is_terminal_state(nextPosition) else -1
-                return self.state_to_int(self.getState(nextPosition))
+                self.agentPosition = next_position
+                self.reward = 10 if self.is_terminal_state(next_position) else -1
+                return self.state_to_int(self.get_state(next_position))
         elif action == 'R':
             if state[2] == 1:
                 self.reward = -5
                 return self.state_to_int(state)
             else:
-                self.agentPosition = nextPosition
-                self.reward = 10 if self.is_terminal_state(nextPosition) else -1
-                return self.state_to_int(self.getState(nextPosition))
+                self.agentPosition = next_position
+                self.reward = 10 if self.is_terminal_state(next_position) else -1
+                return self.state_to_int(self.get_state(next_position))
+        """
+        # return to_return
 
-    def step(self, action):
-        agentX, agentY = self.get_agent_row_column()
-        current_state = self.getState()
-        resulting_position = self.agentPosition + self.actionSpace[action]
+    def step(self, action: str) -> tuple[int, int, bool, object]:
+        """
+        Data un azione la esegue.
+        :param action: azione da eseguire. Carattere singolo che rappresenta la key di actionSpace
+        :return: nuovo stato, reward, done, info
+        """
+        agentX, agentY = self.get_agent_row_column()    # TODO: sembra una riga di codice inutile
 
-        
+        current_state = self.get_state()                                    # prende lo stato attuale dell'agente
+        resulting_position = self.agentPosition + self.actionSpace[action]  # calcola la nuova posizione dell'agente
+
+        return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(resulting_position), None
+        """
         if not self.off_grid_move(resulting_position, self.agentPosition):
-            return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(resulting_position), None
+            return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(
+                resulting_position), None
         else:
-            self.reward = -5                                                                                    
+            self.reward = -5    # TODO: vedere se si può togliere
             return self.state_to_int(current_state), self.reward, self.is_terminal_state(self.agentPosition), None
+        """
 
-    def reset(self):
-        self.agentPosition = 0
-        #self.grid = np.zeros((self.m, self.n))
-        return self.state_to_int(self.getState())
+    def reset(self) -> int:
+        """
+        Resetta lo stato dell'ambiente e ritorna lo stato/osservazione iniziale
+
+        :return: stato/osservazione iniziale
+        """
+        self.agentPosition = 0  # l'agente viene rimesso allo stato iniziale
+
+        return self.state_to_int(self.get_state())
 
     def render(self):
+        # TODO: aggiungere il rendering grafico con pygmaes
+        """
+        Stampa lo stato dell'ambiente sullo schermo
+
+        :return:
+        """
+        # TODO: stamparli in base alla dimensione della matrice
         print('------------------------------------------')
         x, y = self.get_agent_row_column()
         for row in range(self.m):
             for col in range(self.n):
-                if row == x and col == y:                   # disegna agente
+                if row == x and col == y:  # disegna agente
                     print('A', end='\t')
-                elif row == self.m-1 and col == self.n-1:   # disegna goal
+                elif row == self.m - 1 and col == self.n - 1:  # disegna goal
                     print('o', end='\t')
-                elif self.grid[row][col] == 1:              # disegna muro
+                elif self.grid[row][col] == 1:  # disegna muro
                     print('X', end='\t')
-                else:                                       # disegna spazio
+                else:  # disegna spazio
                     print('-', end='\t')
             print('\n')
         print('------------------------------------------')
 
     def actionSpaceSample(self):
         return np.random.choice(self.possibleActions)
-#####

@@ -2,6 +2,7 @@ from os import lseek
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class QLearning(object):
     def __init__(self, env):
         self.env = env
@@ -67,7 +68,7 @@ class QLearning(object):
         command=input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
         while  command != 'n':
             if command =='y':
-                action=self.maxAction(Q, self.env.state_to_int(self.env.getState()) , self.env.possibleActions)
+                action=self.maxAction(Q, self.env.state_to_int(self.env.get_state()) , self.env.possibleActions)
             elif command == 'u':
                 action='U'
             elif command == 'd':
