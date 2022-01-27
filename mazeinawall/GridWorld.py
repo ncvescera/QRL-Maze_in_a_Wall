@@ -61,12 +61,14 @@ class GridWorld(object):
 
         return grid
 
-    def is_terminal_state(self, state) -> bool:
+    def is_terminal_state(self, state: int) -> bool:
         """
         Controlla se il stato passato è uno stato finale
+
         :param state: stato da controllare
         :return: True se è uno stato finale, False altrimenti
         """
+
         return state in self.stateGoals
 
     def get_agent_row_column(self, new_state=None):
@@ -81,12 +83,18 @@ class GridWorld(object):
 
             return x, y
 
-    def set_state(self, state):
+    def set_state(self, state: int):
+        """
+        Imposta lo stato dell'agente.
+        :param state: nuovo stato da impostare
+        """
+
         self.agentPosition = state
 
     def off_grid_move(self, new_state, old_state) -> bool:
         """
         Controlla se il nuovo stato è fuori dalla griglia
+
         :param new_state: nuovo stato da controllare
         :param old_state: stato precedente alla mossa
         :return: True se è fuori dalla griglia, False altrimenti
@@ -112,7 +120,7 @@ class GridWorld(object):
         else:
             return False
 
-    def get_state(self, next_position: int = "default") -> np.array:    # TODO: potrebbe dare errore il typing
+    def get_state(self, next_position: int = "default") -> np.array:
         """
         Ottiene lo stato dell'agente. Se next_position è diverso da "default", ottiene il nuovo stato dell'agente.
         Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
@@ -161,7 +169,7 @@ class GridWorld(object):
 
         return state
 
-    def state_to_int(self, state: np.array) -> int:  # TODO: forse può essere STATIC
+    def state_to_int(self, state: np.array) -> int:
         """
         Converte lo stato (array) in un intero.
         Sostanzialmente mappa uno stato a un numero.
@@ -198,9 +206,11 @@ class GridWorld(object):
         to_return = None                # valore da ritornare alla fine
         update_agent_position = True    # controllo se aggiornare la posizione dell'agente
 
-        if self.off_grid_move(next_position, self.agentPosition):   # controlla se si è spostato fuori dalla griglia
-            update_agent_position = False                           # se no effettua le azioni in else
-            self.reward = -5                                        # se si, si considera una collisione col muro
+        # controlla se si è spostato fuori dalla griglia, in caso si considera una collisione col muro
+        # se no effettua le azioni in else
+        if self.off_grid_move(next_position, self.agentPosition):
+            update_agent_position = False
+            self.reward = -5
             to_return = self.state_to_int(state)
 
         else:
@@ -299,5 +309,5 @@ class GridWorld(object):
 
         print(to_print)
 
-    def actionSpaceSample(self):
+    def actionSpaceSample(self):    # TODO: dargli un senso
         return np.random.choice(self.possibleActions)
