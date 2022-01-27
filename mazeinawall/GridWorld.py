@@ -101,15 +101,13 @@ class GridWorld(object):
         else:
             return False
 
-    def is_wall_colliding(self, new_state) -> bool:
+    def is_wall_colliding(self, cell) -> bool:
         """
         Controlla se sta cercando di andare contro un muro
-        :param new_state: nuovo stato da controllare
+        :param cell: nuovo stato da controllare
         :return: True se sta cercando di andare contro un muro, False altrimenti
         """
-        x, y = self.get_agent_row_column(new_state)  # prende la nuova posizione dell'agente
-
-        if self.grid[x][y] == 1:  # controlla se l'agente si troverà su un muro
+        if cell == 1:
             return True
         else:
             return False
@@ -195,25 +193,16 @@ class GridWorld(object):
         :return: intero che rappresenta lo stato
         """
 
-        # TODO: se funziona va a sostiuitre is_wall_colliding
-        def tmp_collaiding(cell):
-            if cell == 1:
-                return True
-            else:
-                return False
-
         state = self.get_state()        # ottento lo stato attuale dell'agente
 
         to_return = None                # valore da ritornare alla fine
         update_agent_position = True    # controllo se aggiornare la posizione dell'agente
 
-
-
-        # TODO: commentare se va, senno rimettere come prima
-        if self.off_grid_move(next_position, self.agentPosition):
-            update_agent_position = False
-            self.reward = -5
+        if self.off_grid_move(next_position, self.agentPosition):   # controlla se si è spostato fuori dalla griglia
+            update_agent_position = False                           # se no effettua le azioni in else
+            self.reward = -5                                        # se si, si considera una collisione col muro
             to_return = self.state_to_int(state)
+
         else:
             # reward e risultato uguali per tutti se non impatta contro un muro
             self.reward = 10 if self.is_terminal_state(next_position) else -1
@@ -223,22 +212,22 @@ class GridWorld(object):
             # "ritorno lo stato corrente" = l'agente non si muove e ha un reward di -5 (azione male male)
             # TODO: si dovrebbe poter usare is_wall_colliding
             if action == 'U':
-                if tmp_collaiding(state[0]):
+                if self.is_wall_colliding(state[0]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'D':
-                if tmp_collaiding(state[3]):
+                if self.is_wall_colliding(state[3]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'L':
-                if state[1] == 1:
+                if self.is_wall_colliding(state[1]):
                     update_agent_position = False
                     self.reward = -5
                     return self.state_to_int(state)
             elif action == 'R':
-                if state[2] == 1:
+                if self.is_wall_colliding(state[2]):
                     update_agent_position = False
                     self.reward = -5
                     return self.state_to_int(state)
@@ -247,43 +236,6 @@ class GridWorld(object):
                 self.agentPosition = next_position
 
         return to_return
-
-        """
-        if action == 'U':
-            if state[0] == 1:
-                self.reward = -5
-                to_return = self.state_to_int(state)
-                # return self.state_to_int(state)
-            else:
-                self.agentPosition = next_position
-                self.reward = 10 if self.is_terminal_state(next_position) else -1
-                return self.state_to_int(self.get_state(next_position))
-        elif action == 'D':
-            if state[3] == 1:
-                self.reward = -5
-                return self.state_to_int(state)
-            else:
-                self.agentPosition = next_position
-                self.reward = 10 if self.is_terminal_state(next_position) else -1
-                return self.state_to_int(self.get_state(next_position))
-        elif action == 'L':
-            if state[1] == 1:
-                self.reward = -5
-                return self.state_to_int(state)
-            else:
-                self.agentPosition = next_position
-                self.reward = 10 if self.is_terminal_state(next_position) else -1
-                return self.state_to_int(self.get_state(next_position))
-        elif action == 'R':
-            if state[2] == 1:
-                self.reward = -5
-                return self.state_to_int(state)
-            else:
-                self.agentPosition = next_position
-                self.reward = 10 if self.is_terminal_state(next_position) else -1
-                return self.state_to_int(self.get_state(next_position))
-        """
-        # return to_return
 
     def step(self, action: str) -> tuple[int, int, bool, object]:
         """
@@ -297,14 +249,6 @@ class GridWorld(object):
         resulting_position = self.agentPosition + self.actionSpace[action]  # calcola la nuova posizione dell'agente
 
         return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(resulting_position), None
-        """
-        if not self.off_grid_move(resulting_position, self.agentPosition):
-            return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(
-                resulting_position), None
-        else:
-            self.reward = -5    # TODO: vedere se si può togliere
-            return self.state_to_int(current_state), self.reward, self.is_terminal_state(self.agentPosition), None
-        """
 
     def reset(self) -> int:
         """
@@ -323,21 +267,24 @@ class GridWorld(object):
 
         :return:
         """
-        # TODO: stamparli in base alla dimensione della matrice
-        print('------------------------------------------')
+        # TODO: si puo' migliorare la stampa toglieno lo \n finale
+
+        spaces = " " * 5
+        print("-" * (self.n + len(spaces) * (self.n - 1)))
+
         x, y = self.get_agent_row_column()
         for row in range(self.m):
             for col in range(self.n):
-                if row == x and col == y:  # disegna agente
-                    print('A', end='\t')
-                elif row == self.m - 1 and col == self.n - 1:  # disegna goal
-                    print('o', end='\t')
-                elif self.grid[row][col] == 1:  # disegna muro
-                    print('X', end='\t')
-                else:  # disegna spazio
-                    print('-', end='\t')
-            print('\n')
-        print('------------------------------------------')
+                if row == x and col == y:
+                    print('A', end=spaces)                      # disegna agente
+                elif row == self.m - 1 and col == self.n - 1:
+                    print('o', end=spaces)                      # disegna goal
+                elif self.grid[row][col] == 1:
+                    print('X', end=spaces)                      # disegna muro
+                else:
+                    print('-', end=spaces)                      # disegna spazio
+            print("\n")
+        print("-" * (self.n + len(spaces) * (self.n - 1)))
 
     def actionSpaceSample(self):
         return np.random.choice(self.possibleActions)
