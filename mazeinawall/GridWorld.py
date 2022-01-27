@@ -129,7 +129,7 @@ class GridWorld(object):
         else:
             return False
 
-    def get_state(self, next_position: int = "default") -> np.array:
+    def get_state(self, next_position: int = None) -> np.array:
         """
         Ottiene lo stato dell'agente. Se next_position è diverso da "default", ottiene il nuovo stato dell'agente.
         Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
@@ -146,35 +146,40 @@ class GridWorld(object):
         :param next_position: nuova posizione dell'agente
         :return: stato dell'agente/osservazione
         """
-        # TODO: vedere se si puo' cambiare default con None
-        if next_position != "default":
+
+        # prende le coordinate dell'agente
+        if next_position is not None:
             x, y = self.get_agent_row_column(next_position)
         else:
             x, y = self.get_agent_row_column()
 
-        # TODO: comprendere questi calcoli
+        # calcola il vicinato di Von Neumann e lo restituisce come array (spiattellato)
+        # e.g.: [0, 1, 1, 0]
+        #        U  L  R  D
+        #
+        # ogni if controlla se la relativa posizione controllate è fuori dalla matrice
+        # se lo è viene considerata come un muro
         if x > 0:
-            a = self.grid[x - 1][y]
+            up = self.grid[x - 1][y]
         else:
-            a = 1
+            up = 1
 
         if y > 0:
-            b = self.grid[x][y - 1]
+            left = self.grid[x][y - 1]
         else:
-            b = 1
+            left = 1
 
         if y < self.n - 1:
-            d = self.grid[x][y + 1]
+            right = self.grid[x][y + 1]
         else:
-            d = 1
+            right = 1
 
         if x < self.m - 1:
-            e = self.grid[x + 1][y]
+            down = self.grid[x + 1][y]
         else:
-            e = 1
-        ###
+            down = 1
 
-        state = np.array([a, b, d, e])  # stato da ritornare
+        state = np.array([up, left, right, down])  # stato da ritornare
 
         return state
 
