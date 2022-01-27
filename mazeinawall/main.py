@@ -3,7 +3,7 @@ from QLearning import QLearning
 
 
 if __name__ == '__main__':
-    env = GridWorld(9, 9)
+    env = GridWorld(10, 10)
     QL = QLearning(env)
 
     '''self.grid = np.array([[0, 1, 1, 0, 0, 0, 0, 0, 0],

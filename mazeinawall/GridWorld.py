@@ -267,24 +267,37 @@ class GridWorld(object):
 
         :return:
         """
-        # TODO: si puo' migliorare la stampa toglieno lo \n finale
 
-        spaces = " " * 5
-        print("-" * (self.n + len(spaces) * (self.n - 1)))
+        # variabili per stampare la matrice
+        to_print = ""   # stringa da stampare alla fine
 
-        x, y = self.get_agent_row_column()
+        spaces = " " * 5    # spazi tra le celle
+        line_between_spaces = ("| " + " " * (self.n + len(spaces) * (self.n - 1))) + " |\n"  # linea vuota tra le celle
+        horizontal_line = "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"          # bordo della matrice
+        x, y = self.get_agent_row_column()  # posizione dell'agente
+
+        # stampa la matrice
+        to_print += horizontal_line         # stampa il bordo superiore
         for row in range(self.m):
+            to_print += "| "
             for col in range(self.n):
                 if row == x and col == y:
-                    print('A', end=spaces)                      # disegna agente
+                    to_print += f"A{spaces}"                      # disegna agente
                 elif row == self.m - 1 and col == self.n - 1:
-                    print('o', end=spaces)                      # disegna goal
+                    to_print += f"o{spaces}"                      # disegna goal
                 elif self.grid[row][col] == 1:
-                    print('X', end=spaces)                      # disegna muro
+                    to_print += f"X{spaces}"                      # disegna muro
                 else:
-                    print('-', end=spaces)                      # disegna spazio
-            print("\n")
-        print("-" * (self.n + len(spaces) * (self.n - 1)))
+                    to_print += f"-{spaces}"                      # disegna spazio vuoto
+
+            to_print = to_print[:-len(spaces)]  # toglie l'ultimo spazio
+            to_print += " |\n"
+            to_print += line_between_spaces
+
+        to_print = to_print[:-len(line_between_spaces)]                         # toglie l'ultima riga
+        to_print += "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"   # stampa il bordo inferiore
+
+        print(to_print)
 
     def actionSpaceSample(self):
         return np.random.choice(self.possibleActions)
