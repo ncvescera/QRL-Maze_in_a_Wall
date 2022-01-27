@@ -3,7 +3,7 @@ import random
 
 
 class GridWorld(object):
-    def __init__(self, m=9, n=9, walls=10, grid=None):
+    def __init__(self, m=9, n=9, walls=10, grid=None):  # TODO: fare in modo di creare matrici random senza seed
         # sezione per la generazione dei seed
         np.random.seed(22)
         random.seed(22)
@@ -210,7 +210,6 @@ class GridWorld(object):
 
             # controllo se impatta contro un muro: se si, ritorno lo stato corrente e reward -5
             # "ritorno lo stato corrente" = l'agente non si muove e ha un reward di -5 (azione male male)
-            # TODO: si dovrebbe poter usare is_wall_colliding
             if action == 'U':
                 if self.is_wall_colliding(state[0]):
                     update_agent_position = False
@@ -232,6 +231,7 @@ class GridWorld(object):
                     self.reward = -5
                     return self.state_to_int(state)
 
+            # se True, vuol dire che l'agente non è andato contro un muro e quindi si può spostare
             if update_agent_position:
                 self.agentPosition = next_position
 
@@ -243,11 +243,11 @@ class GridWorld(object):
         :param action: azione da eseguire. Carattere singolo che rappresenta la key di actionSpace
         :return: nuovo stato, reward, done, info
         """
-        agentX, agentY = self.get_agent_row_column()    # TODO: sembra una riga di codice inutile
 
-        current_state = self.get_state()                                    # prende lo stato attuale dell'agente
-        resulting_position = self.agentPosition + self.actionSpace[action]  # calcola la nuova posizione dell'agente
+        # calcola la nuova posizione dell'agente
+        resulting_position = self.agentPosition + self.actionSpace[action]
 
+        # effettua la mossa
         return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(resulting_position), None
 
     def reset(self) -> int:
