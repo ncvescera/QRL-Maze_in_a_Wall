@@ -3,8 +3,11 @@ from QLearning import QLearning
 import numpy as np
 from os import system
 
+
 def main():
     menu()
+
+    # TODO: aggiungere caricamento matrice da file
 
     """
         grid = np.array([[0, 1, 1, 0, 0, 0, 0, 0, 0],
@@ -18,8 +21,10 @@ def main():
                               [1, 1, 1, 1, 1, 1, 1, 1, 0]])
         env = GridWorld(grid=grid)
     """
-
-    env = GridWorld(10, 10)
+    grid = grid_from_file("matrix")
+    env = GridWorld(grid=grid)
+    # env = GridWorld(5, 6)
+    # env = GridWorld(8, 8)
     QL = QLearning(env)
 
     command = input(": ")
@@ -30,7 +35,7 @@ def main():
         QL.training(epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True)
     elif command == '2':
         print("Execute\n")
-        QL.execute()
+        QL.execute(step_by_step=False)
 
     else:
         print('End\n')
@@ -46,6 +51,26 @@ def menu():
     print("\tTraining (1)")
     print("\tExecute step-by step (2)")
     print("\tExit (0)")
+
+
+def grid_from_file(filename):
+    grid = np.loadtxt(filename, dtype=int)
+    return grid
+
+
+"""
+# a_star search
+def a_star(graph, start, goal):
+    visited, queue = set(), [(start, 0)]
+    while queue:
+        vertex, dist = queue.pop(0)
+        if vertex not in visited:
+            visited.add(vertex)
+            queue.extend(((vertex, dist + 1), graph[vertex] - visited))
+            if vertex == goal:
+                return dist
+    return None
+"""
 
 
 if __name__ == '__main__':
