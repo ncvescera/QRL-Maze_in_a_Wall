@@ -27,7 +27,7 @@ class GridWorld(object):
 
         # definizione delle azioni possibili e spazio delle azioni
         # TODO: commentare meglio
-        self.actionSpace = {'U': -self.m, 'D': self.m, 'L': -1, 'R': 1}
+        self.actionSpace = {'U': -self.n, 'D': self.n, 'L': -1, 'R': 1}
         self.possibleActions = ['U', 'D', 'L', 'R']
 
         # posizione dell'agente e stato iniziale
@@ -82,12 +82,12 @@ class GridWorld(object):
 
         # TODO: andrebbe commentato e capito che calcolo viene effettuato
         if new_state is None:
-            x = self.agentPosition // self.m
+            x = int(self.agentPosition / self.n)
             y = self.agentPosition % self.n
 
             return x, y
         else:
-            x = new_state // self.m
+            x = int(new_state / self.n)
             y = new_state % self.n
 
             return x, y
@@ -108,13 +108,10 @@ class GridWorld(object):
         :param old_state: stato precedente alla mossa
         :return: True se è fuori dalla griglia, False altrimenti
         """
-        # TODO: ricontrollare
+
         if new_state not in range(self.n * self.m):  # se il nuovo stato non appartiene agli stati
             return True
-        elif old_state % self.m == 0 and new_state % self.m == self.m - 1:
-            return True
-        elif old_state % self.m == self.m - 1 and new_state % self.m == 0:
-            return True
+
         else:
             return False
 

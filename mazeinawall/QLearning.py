@@ -95,7 +95,7 @@ class QLearning(object):
             command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
             while  command != 'n':
                 if command == 'y':
-                    action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()) , self.env.possibleActions)
+                    action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
                 elif command == 'u':
                     action = 'U'
                 elif command == 'd':
@@ -108,6 +108,7 @@ class QLearning(object):
                 observationNext, reward, done, info = self.env.step(action)
                 totReward += reward
                 print("Action:"+str(action)+" Reward:"+str(reward)+"\n")
+
                 self.env.render()
 
                 command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
