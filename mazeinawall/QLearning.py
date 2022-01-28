@@ -1,6 +1,8 @@
 from os import lseek
 import numpy as np
 import matplotlib.pyplot as plt
+from time import sleep
+from os import system
 
 
 class QLearning(object):
@@ -60,28 +62,43 @@ class QLearning(object):
 
 
     # EXECUTE
-    def execute(self):
+    def execute(self, step_by_step=False):
         self.env.reset()
         self.env.render()
         Q=self.loadQ("Qmatrix")
         totReward=0
-        command=input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
-        while  command != 'n':
-            if command =='y':
-                action=self.maxAction(Q, self.env.state_to_int(self.env.get_state()) , self.env.possibleActions)
-            elif command == 'u':
-                action='U'
-            elif command == 'd':
-                action='D'
-            elif command == 'l':
-                action='L'
-            elif command == 'r':
-                action='R'
-            observationNext, reward, done, info = self.env.step(action)
-            totReward += reward
-            print("Action:"+str(action)+" Reward:"+str(reward)+"\n")
-            self.env.render()
-            command=input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
+        if step_by_step:
+            command=input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
+            while  command != 'n':
+                if command =='y':
+                    action=self.maxAction(Q, self.env.state_to_int(self.env.get_state()) , self.env.possibleActions)
+                elif command == 'u':
+                    action='U'
+                elif command == 'd':
+                    action='D'
+                elif command == 'l':
+                    action='L'
+                elif command == 'r':
+                    action='R'
+                observationNext, reward, done, info = self.env.step(action)
+                totReward += reward
+                print("Action:"+str(action)+" Reward:"+str(reward)+"\n")
+                self.env.render()
+                command=input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
+        else:
+            while True:
+                action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
+                observationNext, reward, done, info = self.env.step(action)
+                totReward += reward
+                print("Action:" + str(action) + " Reward:" + str(reward) + "\n")
+                self.env.render()
+
+                if done:
+                    print("Return:" + str(totReward))
+                    break
+
+                sleep(0.5)
+                system("clear")
 
     # TRAINING
     def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS= 1.0, plot=True):
