@@ -27,7 +27,8 @@ class GridWorld(object):
         self.stateGoals = [self.goal]
 
         # definizione delle azioni possibili e spazio delle azioni
-        # TODO: commentare meglio
+        # la griglia viene vista come un array 1D (piatto). Muoversi in su di 1 cella nella matrice
+        # vuol dire spostarsi di -n caselle nell'array.
         self.actionSpace = {'U': -self.n, 'D': self.n, 'L': -1, 'R': 1}
         self.possibleActions = ['U', 'D', 'L', 'R']
 
