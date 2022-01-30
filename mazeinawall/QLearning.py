@@ -107,7 +107,7 @@ class QLearning(object):
 
                 observationNext, reward, done, info = self.env.step(action)
                 totReward += reward
-                print("Action:"+str(action)+" Reward:"+str(reward)+"\n")
+                print("Action:"+str(action)+" Reward:"+str(reward)+ " Obs: " + str(info) + "\n")
 
                 self.env.render()
 

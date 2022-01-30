@@ -32,10 +32,21 @@ def main():
 
     if command == '1':
         print("Training\n")
+        print(f"Maze: {env.grid.shape}")
+
         QL.training(epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True)
+
     elif command == '2':
         print("Execute\n")
-        QL.execute(step_by_step=False)
+
+        # scelta per esecuzione step-by-step
+        scelta = input("Esecuzione step-by-step? (y/n): ")
+        if scelta == 'y':
+            step_by_step = True
+        else:
+            step_by_step = False
+
+        QL.execute(step_by_step=step_by_step)
 
     else:
         print('End\n')
