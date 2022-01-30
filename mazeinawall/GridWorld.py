@@ -85,7 +85,8 @@ class GridWorld(object):
         :return: coordinate x, y della posizione dell'agente
         """
 
-        # TODO: andrebbe commentato e capito che calcolo viene effettuato
+        # per prendere la x si effettua la divisione e si prende solo la parte intera
+        # così questo calcolo funziona per tutte le matrici.
         if new_state is None:
             x = int(self.agentPosition / self.n)
             y = self.agentPosition % self.n
