@@ -13,6 +13,7 @@ class GUI:
     start_color = (0, 255, 0)
     goal_color = (0, 0, 255)
     agent_color = (255, 0, 0)
+    path_color = (192, 192, 192)
 
     def __init__(self, matrix: np.ndarray, cell_size=65):
         self.matrix = matrix
@@ -23,9 +24,12 @@ class GUI:
         self.goal = (self.x - 1, self.y - 1)
 
         self.cell_size = cell_size
-        self.surface = None
+
+        # inizializza il set di celle visitate (per colorare il path)
+        self.visited_cells = set()
 
         # inizializza la finestra di pygame
+        self.surface = None
         self.__init_pygame()
 
     def __init_pygame(self):
@@ -59,6 +63,7 @@ class GUI:
                     col = self.col_background
 
                 if i == agent_x and j == agent_y:
+                    self.visited_cells.add((i, j))
                     col = self.agent_color
 
                 elif i == self.start[0] and j == self.start[1]:
@@ -66,6 +71,8 @@ class GUI:
 
                 elif i == self.goal[0] and j == self.goal[1]:
                     col = self.goal_color
+                elif (i, j) in self.visited_cells:
+                    col = self.path_color
 
                 # stampa la cella corrente
                 pygame.draw.rect(self.surface, col, (j * self.cell_size, i * self.cell_size, self.cell_size - 1, self.cell_size - 1))

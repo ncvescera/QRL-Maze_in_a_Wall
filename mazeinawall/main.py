@@ -90,6 +90,8 @@ def grid_from_file(filename: str) -> np.ndarray:
     # prova a caricare da file
     try:
         grid = np.loadtxt(filename, dtype=int)
+        print(f"Caricata matrice {grid.shape}")
+
     except FileNotFoundError:
         grid = None
 
