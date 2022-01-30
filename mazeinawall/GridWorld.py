@@ -197,7 +197,7 @@ class GridWorld(object):
         for i in range(len(state)):
             # mettere anche se uguale a 3
             if state[i] == 1:
-                result += 2 ** i  # TODO: forse era 2 ** (i + 1)
+                result += 2 ** i
         return result
 
     def calculate_next_state(self, action, next_position) -> int:
