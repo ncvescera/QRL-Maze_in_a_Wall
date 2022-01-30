@@ -1,13 +1,15 @@
 import numpy as np
 import random
 from GUI import GUI
+from maze_utils import is_solvable
 
 
 class GridWorld(object):
-    def __init__(self, m=9, n=9, walls=10, grid=None):  # TODO: fare in modo di creare matrici random senza seed
+    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=False):  # TODO: fare in modo di creare matrici random senza seed
         # sezione per la generazione dei seed
-        np.random.seed(22)
-        random.seed(22)
+        if seeded:
+            np.random.seed(22)
+            random.seed(22)
 
         # dimensione matrice
         self.m = m
@@ -55,20 +57,28 @@ class GridWorld(object):
         :param walls: numero di muri da inserire nella matrice  # TODO: rendere una percentuale
         :return: matrice di dimensione m x n con muri
         """
-        grid = np.zeros((self.m, self.n))  # matrice piena di 0
 
-        for _ in range(walls):
-            # genera a caso una posizione dove inserire il muro
-            x = random.randint(0, self.m - 1)
-            y = random.randint(0, self.n - 1)
+        if walls >= (self.m * self.n / 2):
+            print("Hai scelto troppi muri, non è possibile generare un labirinto esplorabile !!!")
+            exit()
 
-            # se la cella scelta è il goal o lo stato iniziale la rigenera
-            # while x == 0 and y == 0 or x == self.goal and y == self.goal:
-            while x == 0 and y == 0 or x == (self.m - 1) and y == (self.n - 1):
+        solvable = False
+        while not solvable:
+            grid = np.zeros((self.m, self.n), dtype=int)  # matrice piena di 0
+
+            for _ in range(walls):
+                # genera a caso una posizione dove inserire il muro
                 x = random.randint(0, self.m - 1)
                 y = random.randint(0, self.n - 1)
 
-            grid[x][y] = 1  # aggiunge il muro
+                # se la cella scelta è il goal o lo stato iniziale la rigenera
+                while (x == 0 and y == 0) or (x == (self.m - 1) and y == (self.n - 1)):
+                    x = random.randint(0, self.m - 1)
+                    y = random.randint(0, self.n - 1)
+
+                grid[x][y] = 1  # aggiunge il muro
+
+            solvable = is_solvable(grid)
 
         return grid
 

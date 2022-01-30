@@ -8,17 +8,15 @@ def main():
     # prova a caricare la matrice da file
     grid = grid_from_file("matrix")
 
-    # controlla che il labirinto sia esplorabile
-    solvable = is_solvable(grid)
-
-    if not solvable:
-        print("Il labirinto non e' esplorabile !!")
-        return
-
     # crea l'ambiente
     if grid is None:
         env = GridWorld(5, 6)
     else:
+        # controlla che il labirinto sia esplorabile
+        if not is_solvable(grid):
+            print("Il labirinto non e' esplorabile !!")
+            return
+
         env = GridWorld(grid=grid)
 
     # inizializza l'algoritmo di QLearning
