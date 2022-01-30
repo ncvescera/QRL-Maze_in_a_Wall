@@ -40,13 +40,19 @@ def main():
         print("Execute\n")
 
         # scelta per esecuzione step-by-step
-        scelta = input("Esecuzione step-by-step? (y/n): ")
+        scelta = input("Esecuzione step-by-step? (y/N): ").lower()
         if scelta == 'y':
             step_by_step = True
         else:
             step_by_step = False
 
-        QL.execute(step_by_step=step_by_step)
+        scelta = input("GUI? (Y/n): ").lower()
+        if scelta == 'n':
+            gui = False
+        else:
+            gui = True
+
+        QL.execute(step_by_step=step_by_step, gui=gui)
 
     else:
         print('End\n')

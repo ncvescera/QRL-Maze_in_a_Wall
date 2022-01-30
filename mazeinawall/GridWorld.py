@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from gui import GUI
 
 
 class GridWorld(object):
@@ -36,6 +37,9 @@ class GridWorld(object):
 
         # init del reward, sarà cambiato in seguito
         self.reward = 0
+
+        # inizializzo l'oggetto responsabile della GUI
+        self.gui = None
 
     def generate_grid(self, walls=10) -> np.ndarray:
         """
@@ -283,44 +287,71 @@ class GridWorld(object):
 
         return self.state_to_int(self.get_state())
 
-    def render(self):
-        # TODO: aggiungere il rendering grafico con pygmaes
+    def render(self, gui=True) -> bool:
         """
         Stampa lo stato dell'ambiente sullo schermo
 
-        :return:
+        :return: True se il rendering è andato a buon fine, False se l'utente ha chiuso la finestra
         """
 
-        # variabili per stampare la matrice
-        to_print = ""   # stringa da stampare alla fine
+        def cli_render():
+            """
+            Stampa la matrice nel terminale
+            """
 
-        spaces = " " * 5    # spazi tra le celle
-        line_between_spaces = ("| " + " " * (self.n + len(spaces) * (self.n - 1))) + " |\n"  # linea vuota tra le celle
-        horizontal_line = "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"          # bordo della matrice
-        x, y = self.get_agent_row_column()  # posizione dell'agente
+            # variabili per stampare la matrice
+            to_print = ""   # stringa da stampare alla fine
 
-        # stampa la matrice
-        to_print += horizontal_line         # stampa il bordo superiore
-        for row in range(self.m):
-            to_print += "| "
-            for col in range(self.n):
-                if row == x and col == y:
-                    to_print += f"A{spaces}"                      # disegna agente
-                elif row == self.m - 1 and col == self.n - 1:
-                    to_print += f"o{spaces}"                      # disegna goal
-                elif self.grid[row][col] == 1:
-                    to_print += f"X{spaces}"                      # disegna muro
-                else:
-                    to_print += f"-{spaces}"                      # disegna spazio vuoto
+            spaces = " " * 5    # spazi tra le celle
+            line_between_spaces = ("| " + " " * (self.n + len(spaces) * (self.n - 1))) + " |\n"  # linea vuota tra le celle
+            horizontal_line = "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"          # bordo della matrice
+            x, y = self.get_agent_row_column()  # posizione dell'agente
 
-            to_print = to_print[:-len(spaces)]  # toglie l'ultimo spazio
-            to_print += " |\n"
-            to_print += line_between_spaces
+            # stampa la matrice
+            to_print += horizontal_line         # stampa il bordo superiore
+            for row in range(self.m):
+                to_print += "| "
+                for col in range(self.n):
+                    if row == x and col == y:
+                        to_print += f"A{spaces}"                      # disegna agente
+                    elif row == self.m - 1 and col == self.n - 1:
+                        to_print += f"o{spaces}"                      # disegna goal
+                    elif self.grid[row][col] == 1:
+                        to_print += f"X{spaces}"                      # disegna muro
+                    else:
+                        to_print += f"-{spaces}"                      # disegna spazio vuoto
 
-        to_print = to_print[:-len(line_between_spaces)]                         # toglie l'ultima riga
-        to_print += "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"   # stampa il bordo inferiore
+                to_print = to_print[:-len(spaces)]  # toglie l'ultimo spazio
+                to_print += " |\n"
+                to_print += line_between_spaces
 
-        print(to_print)
+            to_print = to_print[:-len(line_between_spaces)]                         # toglie l'ultima riga
+            to_print += "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"   # stampa il bordo inferiore
+
+            print(to_print)
+
+        def gui_render() -> bool:
+            """
+            Stampa la matrice sullo schermo con pygame
+
+            :return: False se l'utente ha chiuso la finestra, True altrimenti
+            """
+
+            # La prima volta che viene chiamato il metodo render inizializza pygame.
+            # Evita di generare una finestra di pygame quando non richiesto
+            if self.gui is None:
+                self.gui = GUI(self.grid)
+
+            return self.gui.draw(self.get_agent_row_column())
+
+        if gui:
+            is_alive = gui_render()
+
+        else:
+            cli_render()
+            is_alive = True  # ritorna sempre True dato che non c'è una finestra di pygame
+
+        return is_alive
 
     def actionSpaceSample(self):    # TODO: dargli un senso
         return np.random.choice(self.possibleActions)
