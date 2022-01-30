@@ -267,9 +267,11 @@ class GridWorld(object):
 
         # calcola la nuova posizione dell'agente
         resulting_position = self.agentPosition + self.actionSpace[action]
+        next_state = self.calculate_next_state(action, resulting_position)
+        info = {str(self.get_state())}
 
         # effettua la mossa
-        return self.calculate_next_state(action, resulting_position), self.reward, self.is_terminal_state(resulting_position), None
+        return next_state, self.reward, self.is_terminal_state(resulting_position), info
 
     def reset(self) -> int:
         """
