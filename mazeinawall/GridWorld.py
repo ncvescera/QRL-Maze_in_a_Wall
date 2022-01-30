@@ -5,7 +5,7 @@ from maze_utils import is_solvable
 
 
 class GridWorld(object):
-    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=False):  # TODO: fare in modo di creare matrici random senza seed
+    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=True):  # TODO: fare in modo di creare matrici random senza seed
         # sezione per la generazione dei seed
         if seeded:
             np.random.seed(22)
