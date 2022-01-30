@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from gui import GUI
+from GUI import GUI
 
 
 class GridWorld(object):
