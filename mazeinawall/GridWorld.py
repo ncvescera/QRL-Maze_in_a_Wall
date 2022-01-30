@@ -201,7 +201,6 @@ class GridWorld(object):
         return result
 
     def calculate_next_state(self, action, next_position) -> int:
-        # TODO: ricontrollare meglio la faccenda
         """
         Calcola il nuovo stato dell'agente in base all'azione e alla nuova posizione.
         In base all'azione calcola anche il reward.
