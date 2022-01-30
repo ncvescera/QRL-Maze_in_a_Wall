@@ -74,18 +74,19 @@ class QLearning(object):
 
         return Q
 
-    def execute(self, step_by_step=False, sleep_time=0.5):
+    def execute(self, step_by_step=False, sleep_time=0.5, gui=True):
         """
         Permette l'esecuzione del Q-Learning mostrando a schermo i movimenti dell'agente con il reward ottenuto.
         Permette l'esecuzione step-by-step o automatica.
 
         :param step_by_step: se True, l'esecuzione viene fatta step-by-step, altrimenti automatica
         :param sleep_time: tempo di attesa tra uno step e l'altro
+        :param gui: se True, mostra a schermo il movimento dell'agente con pygame
         """
 
         # visualizzazione dello stato iniziale
         self.env.reset()
-        self.env.render()
+        self.env.render(gui=gui)
 
         # carico la matrice Q
         Q = self.loadQ("Qmatrix")
@@ -93,7 +94,7 @@ class QLearning(object):
         totReward = 0
         if step_by_step:    # esecuzione step-by-step
             command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
-            while  command != 'n':
+            while command != 'n':
                 if command == 'y':
                     action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
                 elif command == 'u':
@@ -109,21 +110,24 @@ class QLearning(object):
                 totReward += reward
                 print("Action:"+str(action)+" Reward:"+str(reward)+ " Obs: " + str(info) + "\n")
 
-                self.env.render()
+                self.env.render(gui=gui)
 
                 command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
 
         else:   # esecuzione automatica
-            while True:
+            alive = True
+            while alive:
                 action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
                 observationNext, reward, done, info = self.env.step(action)
                 totReward += reward
 
                 print("Action:" + str(action) + " Reward:" + str(reward) + "\n")
-                self.env.render()
+                alive = self.env.render(gui=gui)   # se l'utente chiude la finestra prima della fine dell'esecuzione il programma termina
 
                 if done:
                     print("Return:" + str(totReward))
+                    if gui:
+                        self.env.gui.wait()     # aspetta che l'utente chiuda la finestra
                     break
 
                 sleep(sleep_time)      # tempo di attesa per visualizzare lo stato successivo
@@ -149,7 +153,7 @@ class QLearning(object):
                 Q[state, action] = 0
 
         self.env.reset()
-        self.env.render()
+        self.env.render(gui=False)      # nella fase di training la matrice si stampa SOLO sul terminale
 
         totalRewards = np.zeros(epochs)
         for i in range(epochs):
