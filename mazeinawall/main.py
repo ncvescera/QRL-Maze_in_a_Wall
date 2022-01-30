@@ -1,25 +1,19 @@
 from GridWorld import GridWorld
 from QLearning import QLearning
-import numpy as np
 from os import system
+from maze_utils import is_solvable, grid_from_file
 
 
 def main():
-    """
-        grid = np.array([[0, 1, 1, 0, 0, 0, 0, 0, 0],
-                              [0, 1, 0, 0, 0, 0, 0, 0, 0],
-                              [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                              [1, 1, 0, 0, 1, 1, 0, 1, 0],
-                              [1, 1, 0, 0, 1, 0, 0, 0, 0],
-                              [1, 1, 1, 1, 1, 0, 0, 0, 0],
-                              [1, 1, 0, 0, 0, 0, 0, 0, 0],
-                              [1, 1, 1, 1, 1, 1, 1, 0, 0],
-                              [1, 1, 1, 1, 1, 1, 1, 1, 0]])
-        env = GridWorld(grid=grid)
-    """
-
     # prova a caricare la matrice da file
     grid = grid_from_file("matrix")
+
+    # controlla che il labirinto sia esplorabile
+    solvable = is_solvable(grid)
+
+    if not solvable:
+        print("Il labirinto non e' esplorabile !!")
+        return
 
     # crea l'ambiente
     if grid is None:
@@ -77,40 +71,6 @@ def menu():
     print("\tTraining (1)")
     print("\tExecute step-by step (2)")
     print("\tExit (0)")
-
-
-def grid_from_file(filename: str) -> np.ndarray:
-    """
-    Carica la matrice da file se esiste, altrimenti restituisce None
-
-    :param filename: nome del file da caricare
-    :return: la matrice caricata o None
-    """
-
-    # prova a caricare da file
-    try:
-        grid = np.loadtxt(filename, dtype=int)
-        print(f"Caricata matrice {grid.shape}")
-
-    except FileNotFoundError:
-        grid = None
-
-    return grid
-
-
-"""
-# a_star search
-def a_star(graph, start, goal):
-    visited, queue = set(), [(start, 0)]
-    while queue:
-        vertex, dist = queue.pop(0)
-        if vertex not in visited:
-            visited.add(vertex)
-            queue.extend(((vertex, dist + 1), graph[vertex] - visited))
-            if vertex == goal:
-                return dist
-    return None
-"""
 
 
 if __name__ == '__main__':
