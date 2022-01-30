@@ -23,7 +23,13 @@ class GridWorld(object):
         self.goal = (self.m * self.n) - 1
 
         # definizione spazio degli stati e goal
-        self.stateSpace = [i for i in range(16)]  # TODO: capire perche 16
+        # TODO: capire perche 16
+        """
+        potrebbe venire da 2^4 = 16, dove
+            2: il numero di elementi possibili in una cella dell'osservazione (0 o 1)
+            4: il numero delle celle dell'osservazione (e.g. [0, 1, 1, 0])
+        """
+        self.stateSpace = [i for i in range(16)]
         self.stateGoals = [self.goal]
 
         # definizione delle azioni possibili e spazio delle azioni
