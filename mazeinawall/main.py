@@ -5,10 +5,6 @@ from os import system
 
 
 def main():
-    menu()
-
-    # TODO: aggiungere caricamento matrice da file
-
     """
         grid = np.array([[0, 1, 1, 0, 0, 0, 0, 0, 0],
                               [0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -21,13 +17,21 @@ def main():
                               [1, 1, 1, 1, 1, 1, 1, 1, 0]])
         env = GridWorld(grid=grid)
     """
+
+    # prova a caricare la matrice da file
     grid = grid_from_file("matrix")
-    env = GridWorld(grid=grid)
-    # env = GridWorld(5, 6)
-    # env = GridWorld(8, 8)
+
+    # crea l'ambiente
+    if grid is None:
+        env = GridWorld(5, 6)
+    else:
+        env = GridWorld(grid=grid)
+
+    # inizializza l'algoritmo di QLearning
     QL = QLearning(env)
 
-    command = input(": ")
+    menu()                  # stampa il menu
+    command = input(": ")   # attende la scelta dell'utente
     system("clear")
 
     if command == '1':
@@ -59,19 +63,36 @@ def main():
 
 
 def menu():
+    """
+    Stampa il menu iniziale
+
+    """
+
     system("clear")
 
-    print("***********************")
-    print("GridWorld Demo")
-    print("***********************")
+    # print("***********************")
+    print(" Maze in a Wall - QLearning")
+    print("-+" * 20)
     print("")
     print("\tTraining (1)")
     print("\tExecute step-by step (2)")
     print("\tExit (0)")
 
 
-def grid_from_file(filename):
-    grid = np.loadtxt(filename, dtype=int)
+def grid_from_file(filename: str) -> np.ndarray:
+    """
+    Carica la matrice da file se esiste, altrimenti restituisce None
+
+    :param filename: nome del file da caricare
+    :return: la matrice caricata o None
+    """
+
+    # prova a caricare da file
+    try:
+        grid = np.loadtxt(filename, dtype=int)
+    except FileNotFoundError:
+        grid = None
+
     return grid
 
 
