@@ -10,8 +10,11 @@ def main():
 
     # crea l'ambiente
     if grid is None:
+        print(f"Generazione matrice random")
         env = GridWorld(5, 6)
     else:
+        print(f"Caricata matrice {grid.shape}")
+
         # controlla che il labirinto sia esplorabile
         if not is_solvable(grid):
             print("Il labirinto non e' esplorabile !!")
