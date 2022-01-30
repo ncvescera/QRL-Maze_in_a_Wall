@@ -48,7 +48,7 @@ class QLearning(object):
 
         np.savetxt(fileName, Qmatrix, delimiter=" ")
 
-    def loadQ(self, fileName: str) -> dict[tuple[Any, Any], Union[int, Any]]:   # TODO: forse dovrei capire meglio il tipo di dato
+    def loadQ(self, fileName: str) -> dict[tuple[int, str], float]:   # TODO: capire l'associazione tuple - float
         """
         Carica in memoria la matrice Q ottenuta dalla fase di allenamento.
 
@@ -71,6 +71,8 @@ class QLearning(object):
                     Q[state, action] = Qmatrix[x][y]
                     y += 1
             x += 1
+
+        # print(Q)
 
         return Q
 
