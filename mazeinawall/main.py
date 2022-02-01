@@ -33,7 +33,8 @@ def main():
         print("Training\n")
         print(f"Maze: {env.grid.shape}")
 
-        QL.training(epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True)
+        # QL.training(epochs=50000, steps=1000, ALPHA=0.01, GAMMA=0.5, EPS=0.9, plot=True)
+        QL.training(epochs=6000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=0.9, plot=True)
 
     elif command == '2':
         print("Execute\n")
@@ -65,7 +66,6 @@ def menu():
 
     system("clear")
 
-    # print("***********************")
     print(" Maze in a Wall - QLearning")
     print("-+" * 20)
     print("")
