@@ -5,7 +5,9 @@ from maze_utils import is_solvable
 
 
 class GridWorld(object):
-    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=True):  # TODO: fare in modo di creare matrici random senza seed
+
+    # TODO: fare in modo di creare matrici random senza seed
+    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=False):
         # sezione per la generazione dei seed
         if seeded:
             np.random.seed(22)
@@ -25,9 +27,8 @@ class GridWorld(object):
         self.goal = (self.m * self.n) - 1
 
         # definizione spazio degli stati e goal
-        # TODO: capire perche 16
         """
-        potrebbe venire da 2^4 = 16, dove
+        viene da 2^4 = 16, dove
             2: il numero di elementi possibili in una cella dell'osservazione (0 o 1)
             4: il numero delle celle dell'osservazione (e.g. [0, 1, 1, 0])
         """
@@ -154,13 +155,13 @@ class GridWorld(object):
         Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
             Dove :
                 [0] -> posizione sopra l'agente (UP)
-                [1] -> posizione a sinistra l'agente (LEFT)
-                [2] -> posizione a destra dell'agente (RIGHT)
-                [3] -> posizione sotto all'agente (DOWN)
+                [1] -> posizione a destra l'agente (RIGHT)
+                [2] -> posizione sotto all'agente (DOWN)
+                [3] -> posizione a sinistra dell'agente (LEFT)
         In sostanza il vicinato di Von Neumann.
                     0
-                1   A   2
-                    3
+                3   A   1
+                    2
 
         :param next_position: nuova posizione dell'agente
         :return: stato dell'agente/osservazione
@@ -174,7 +175,7 @@ class GridWorld(object):
 
         # calcola il vicinato di Von Neumann e lo restituisce come array (spiattellato)
         # e.g.: [0, 1, 1, 0]
-        #        U  L  R  D
+        #        U  R  D  L
         #
         # ogni if controlla se la relativa posizione controllate è fuori dalla matrice
         # se lo è viene considerata come un muro
@@ -198,7 +199,7 @@ class GridWorld(object):
         else:
             down = 1
 
-        state = np.array([up, left, right, down])  # stato da ritornare
+        state = np.array([up, right, down, left])  # stato da ritornare
 
         return state
 
@@ -206,14 +207,18 @@ class GridWorld(object):
         """
         Converte lo stato (array) in un intero.
         Sostanzialmente mappa uno stato a un numero.
+
         :param state: stato da convertire
         :return: intero rappresentante lo stato
         """
+
         result = 0
+        tmp_state = np.flip(state)
+
         for i in range(len(state)):
-            # mettere anche se uguale a 3
-            if state[i] == 1:
+            if tmp_state[i] == 1:
                 result += 2 ** i
+
         return result
 
     def calculate_next_state(self, action, next_position) -> int:
@@ -224,16 +229,16 @@ class GridWorld(object):
         Ricordo che state è un array del tipo [0, 1, 1, 0].
             Dove :
                 [0] -> posizione sopra l'agente (UP)
-                [1] -> posizione a sinistra l'agente (LEFT)
-                [2] -> posizione a destra dell'agente (RIGHT)
-                [3] -> posizione sotto all'agente (DOWN)
+                [1] -> posizione a destra l'agente (RIGHT)
+                [2] -> posizione sotto all'agente (DOWN)
+                [3] -> posizione a sinistra dell'agente (LEFT)
 
         :param action: azione che ha eseguito l'agente
         :param next_position: nuova posizione dove si troverà l'agente
         :return: intero che rappresenta lo stato
         """
 
-        state = self.get_state()        # ottento lo stato attuale dell'agente
+        state = self.get_state()        # ottengo lo stato attuale dell'agente
 
         to_return = None                # valore da ritornare alla fine
         update_agent_position = True    # controllo se aggiornare la posizione dell'agente
@@ -258,20 +263,20 @@ class GridWorld(object):
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'D':
-                if self.is_wall_colliding(state[3]):
+                if self.is_wall_colliding(state[2]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'L':
+                if self.is_wall_colliding(state[3]):
+                    update_agent_position = False
+                    self.reward = -5
+                    to_return = self.state_to_int(state)
+            elif action == 'R':
                 if self.is_wall_colliding(state[1]):
                     update_agent_position = False
                     self.reward = -5
-                    return self.state_to_int(state)
-            elif action == 'R':
-                if self.is_wall_colliding(state[2]):
-                    update_agent_position = False
-                    self.reward = -5
-                    return self.state_to_int(state)
+                    to_return = self.state_to_int(state)
 
             # se True, vuol dire che l'agente non è andato contro un muro e quindi si può spostare
             if update_agent_position:
@@ -300,6 +305,7 @@ class GridWorld(object):
 
         :return: stato/osservazione iniziale
         """
+
         self.agentPosition = 0  # l'agente viene rimesso allo stato iniziale
 
         return self.state_to_int(self.get_state())

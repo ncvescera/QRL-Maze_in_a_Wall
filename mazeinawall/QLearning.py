@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import sleep
 from os import system
+from random import randint
 
 
 class QLearning(object):
@@ -22,7 +23,6 @@ class QLearning(object):
         """
 
         values = np.array([Q[state, a] for a in actions])
-        action = np.argmax(values)  # TODO: lo fa due volte, ha senso ??
         action = np.argmax(values)
 
         return actions[action]
@@ -48,7 +48,7 @@ class QLearning(object):
 
         np.savetxt(fileName, Qmatrix, delimiter=" ")
 
-    def loadQ(self, fileName: str) -> dict[tuple[int, str], float]:   # TODO: capire l'associazione tuple - float
+    def loadQ(self, fileName: str) -> dict[tuple[int, str], float]:  # TODO: capire l'associazione tuple - float
         """
         Carica in memoria la matrice Q ottenuta dalla fase di allenamento.
 
@@ -68,8 +68,8 @@ class QLearning(object):
         for state in self.env.stateSpace:
             y = 0
             for action in self.env.possibleActions:
-                    Q[state, action] = Qmatrix[x][y]
-                    y += 1
+                Q[state, action] = Qmatrix[x][y]
+                y += 1
             x += 1
 
         # print(Q)
@@ -94,8 +94,8 @@ class QLearning(object):
         Q = self.loadQ("Qmatrix")
 
         totReward = 0
-        if step_by_step:    # esecuzione step-by-step
-            command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
+        if step_by_step:  # esecuzione step-by-step
+            command = input("Return: " + str(totReward) + " ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
             while command != 'n':
                 if command == 'y':
                     action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
@@ -110,13 +110,13 @@ class QLearning(object):
 
                 observationNext, reward, done, info = self.env.step(action)
                 totReward += reward
-                print("Action:"+str(action)+" Reward:"+str(reward)+ " Obs: " + str(info) + "\n")
+                print("Action:" + str(action) + " Reward:" + str(reward) + " Actual State: " + str(info) + "\n")
 
                 self.env.render(gui=gui)
 
-                command = input("Return: "+str(totReward)+" ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
+                command = input("Return: " + str(totReward) + " ExecuteNext?(y/n/uP/dOWN/lEFT/rIGTH):")
 
-        else:   # esecuzione automatica
+        else:  # esecuzione automatica
             alive = True
             while alive:
                 action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
@@ -124,18 +124,20 @@ class QLearning(object):
                 totReward += reward
 
                 print("Action:" + str(action) + " Reward:" + str(reward) + "\n")
-                alive = self.env.render(gui=gui)   # se l'utente chiude la finestra prima della fine dell'esecuzione il programma termina
+
+                # se l'utente chiude la finestra prima della fine dell'esecuzione il programma termina
+                alive = self.env.render(gui=gui)
 
                 if done:
                     print("Return:" + str(totReward))
                     if gui:
-                        self.env.gui.wait()     # aspetta che l'utente chiuda la finestra
+                        self.env.gui.wait()  # aspetta che l'utente chiuda la finestra
                     break
 
-                sleep(sleep_time)      # tempo di attesa per visualizzare lo stato successivo
+                sleep(sleep_time)  # tempo di attesa per visualizzare lo stato successivo
                 system("clear")
 
-    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS= 1.0, plot=True):
+    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True):
         """
         Funzione che effettua il traning dell'agente con la possibilita' di modificare alcuni parametri.
         Alla fine effettua il salvataggio dela Qmatrix in un file.
@@ -153,13 +155,14 @@ class QLearning(object):
         for state in self.env.stateSpace:
             for action in self.env.possibleActions:
                 Q[state, action] = 0
+                # Q[state, action] = randint(-10, 0)    # random init
 
         self.env.reset()
-        self.env.render(gui=False)      # nella fase di training la matrice si stampa SOLO sul terminale
+        self.env.render(gui=False)  # nella fase di training la matrice si stampa SOLO sul terminale
 
         totalRewards = np.zeros(epochs)
         for i in range(epochs):
-            if i % int(epochs/10) == 0:
+            if i % int(epochs / 10) == 0:
                 print('starting game ', i)
 
             done = False
@@ -168,22 +171,30 @@ class QLearning(object):
             observation = self.env.reset()
             while not done and numActions <= steps:
                 rand = np.random.random()
-                action = self.maxAction(Q, observation, self.env.possibleActions) if rand < (1-EPS) \
-                                                        else self.env.actionSpaceSample()
+                action = self.maxAction(Q, observation, self.env.possibleActions) if rand < (1 - EPS) \
+                    else self.env.actionSpaceSample()
+
                 observationNext, reward, done, info = self.env.step(action)
                 numActions += 1
                 epRewards += reward
 
                 actionNext = self.maxAction(Q, observationNext, self.env.possibleActions)
-                Q[observation, action] = Q[observation, action] + ALPHA*(reward + \
-                            GAMMA*Q[observationNext, actionNext] - Q[observation, action])
+                Q[observation, action] = Q[observation, action] + ALPHA * (reward +
+                                                                           GAMMA * Q[observationNext, actionNext] - Q[
+                                                                               observation, action])
                 observation = observationNext
 
+                self.env.render()
+
+            # a ogni epoca fa scendere EPS di un pochino
+            # dovrebbe permettere il cambio tra exploration ed exploitation
             if EPS - 2 / epochs > 0:
                 EPS -= 2 / epochs
             else:
                 EPS = 0
+
             totalRewards[i] = epRewards
+            self.env.gui.visited_cells.clear()
 
         if plot:
             plt.plot(totalRewards)
