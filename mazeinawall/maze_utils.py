@@ -73,7 +73,7 @@ def grid_from_file(filename: str) -> np.ndarray:
         grid = None
 
     # il file esiste ma risulta vuoto
-    if grid.size == 0:
+    if grid is not None and grid.size == 0:
         grid = None
 
     return grid
