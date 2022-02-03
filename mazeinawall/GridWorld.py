@@ -32,7 +32,7 @@ class GridWorld(object):
             2: il numero di elementi possibili in una cella dell'osservazione (0 o 1)
             4: il numero delle celle dell'osservazione (e.g. [0, 1, 1, 0])
         """
-        self.stateSpace = [i for i in range(16)]
+        self.stateSpace = [i for i in range(2**8)]
         self.stateGoals = [self.goal]
 
         # definizione delle azioni possibili e spazio delle azioni
@@ -150,6 +150,33 @@ class GridWorld(object):
             return False
 
     def get_state(self, next_position: int = None) -> np.array:
+        if next_position is not None:
+            x, y = self.get_agent_row_column(next_position)
+        else:
+            x, y = self.get_agent_row_column()
+
+        vicini = []
+                    #  UL         U         UR       L      R       DL       D      DR
+        for move in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
+            new_x, new_y = x + move[0], y + move[1]     # nuova posizione da osservare
+            to_add = 0
+
+            if new_x < 0:
+                to_add = 1
+            elif new_y < 0:
+                to_add = 1
+            elif new_x > self.m - 1:
+                to_add = 1
+            elif new_y > self.n - 1:
+                to_add = 1
+            else:
+                to_add = self.grid[new_x][new_y]
+
+            vicini.append(to_add)
+
+        return np.array(vicini)
+
+    def get_state_old(self, next_position: int = None) -> np.array:
         """
         Ottiene lo stato dell'agente. Se next_position è diverso da "default", ottiene il nuovo stato dell'agente.
         Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
@@ -212,14 +239,7 @@ class GridWorld(object):
         :return: intero rappresentante lo stato
         """
 
-        result = 0
-        tmp_state = np.flip(state)
-
-        for i in range(len(state)):
-            if tmp_state[i] == 1:
-                result += 2 ** i
-
-        return result
+        return int("".join(map(str, state)), 2)
 
     def calculate_next_state(self, action, next_position) -> int:
         """
@@ -258,12 +278,12 @@ class GridWorld(object):
             # controllo se impatta contro un muro: se si, ritorno lo stato corrente e reward -5
             # "ritorno lo stato corrente" = l'agente non si muove e ha un reward di -5 (azione male male)
             if action == 'U':
-                if self.is_wall_colliding(state[0]):
+                if self.is_wall_colliding(state[1]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'D':
-                if self.is_wall_colliding(state[2]):
+                if self.is_wall_colliding(state[6]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
@@ -273,7 +293,7 @@ class GridWorld(object):
                     self.reward = -5
                     to_return = self.state_to_int(state)
             elif action == 'R':
-                if self.is_wall_colliding(state[1]):
+                if self.is_wall_colliding(state[4]):
                     update_agent_position = False
                     self.reward = -5
                     to_return = self.state_to_int(state)
