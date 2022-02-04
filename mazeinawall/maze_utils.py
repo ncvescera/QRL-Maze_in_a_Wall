@@ -1,4 +1,5 @@
 import numpy as np
+from random import randint
 
 
 def is_solvable(maze, start: tuple[int, int] = None, goal: tuple[int, int] = None) -> bool:
@@ -57,13 +58,15 @@ def is_solvable(maze, start: tuple[int, int] = None, goal: tuple[int, int] = Non
     return False
 
 
-def grid_from_file(filename: str) -> np.ndarray:
+def grid_from_file(filename: str) -> tuple[np.ndarray, str]:
     """
     Carica la matrice da file se esiste, altrimenti restituisce None
 
     :param filename: nome del file da caricare
     :return: la matrice caricata o None
     """
+    grid = None
+    message = ""
 
     # prova a caricare da file
     try:
@@ -71,10 +74,51 @@ def grid_from_file(filename: str) -> np.ndarray:
 
     except FileNotFoundError:
         grid = None
+        message = "File inesistente !"
+        return grid, message
 
     # il file esiste ma risulta vuoto
     if grid is not None and grid.size == 0:
         grid = None
+        message = "Il contenuto del file e' errato !"
+
+    elif not is_solvable(grid):
+        grid = None
+        message = "Il labirinto non e' risolvibile !"
+
+    return grid, message
+
+
+def generate_grid(m, n, walls=10) -> np.ndarray:
+    """
+    Genera una matrice di dimensione m x n con un numero di muri pari a walls.
+    Fa attenzione a non posizionare muri nella cella goa le start.
+    :param walls: numero di muri da inserire nella matrice  # TODO: rendere una percentuale
+    :return: matrice di dimensione m x n con muri
+    """
+
+    if walls >= (m * n / 2):
+        print("Hai scelto troppi muri, non è possibile generare un labirinto esplorabile !!!")
+        return None
+
+    solvable = False
+    grid = None
+    while not solvable:
+        grid = np.zeros((m, n), dtype=int)  # matrice piena di 0
+
+        for _ in range(walls):
+            # genera a caso una posizione dove inserire il muro
+            x = randint(0, m - 1)
+            y = randint(0, n - 1)
+
+            # se la cella scelta è il goal o lo stato iniziale la rigenera
+            while (x == 0 and y == 0) or (x == (m - 1) and y == (n - 1)):
+                x = randint(0, m - 1)
+                y = randint(0, n - 1)
+
+            grid[x][y] = 1  # aggiunge il muro
+
+        solvable = is_solvable(grid)
 
     return grid
 

@@ -238,7 +238,7 @@ class GridWorld(object):
         :param state: stato da convertire
         :return: intero rappresentante lo stato
         """
-
+        # "".join([str(x) for x in state])
         return int("".join(map(str, state)), 2)
 
     def calculate_next_state(self, action, next_position) -> int:
@@ -314,7 +314,9 @@ class GridWorld(object):
         # calcola la nuova posizione dell'agente
         resulting_position = self.agentPosition + self.actionSpace[action]
         next_state = self.calculate_next_state(action, resulting_position)
-        info = {str(self.get_state())}
+
+        actual_state = self.get_state()
+        info = {str(actual_state), str(self.state_to_int(actual_state))}
 
         # effettua la mossa
         return next_state, self.reward, self.is_terminal_state(resulting_position), info
