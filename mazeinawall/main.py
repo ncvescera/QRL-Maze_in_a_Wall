@@ -12,7 +12,7 @@ random_grid_y = 6
 
 def main():
     # prova a caricare la matrice da file
-    grid = grid_from_file(file_toload_name)
+    grid, _ = grid_from_file(file_toload_name)
 
     # crea l'ambiente
     if grid is None:

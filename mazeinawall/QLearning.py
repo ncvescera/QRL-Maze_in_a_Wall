@@ -143,7 +143,7 @@ class QLearning(object):
                 sleep(sleep_time)  # tempo di attesa per visualizzare lo stato successivo
                 system("clear")
 
-    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True):
+    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True, resume=False, plot_name :str = None):
         """
         Funzione che effettua il traning dell'agente con la possibilita' di modificare alcuni parametri.
         Alla fine effettua il salvataggio dela Qmatrix in un file.
@@ -157,12 +157,15 @@ class QLearning(object):
         """
 
         # inizializing Q(state, action) matrix to zero
-        if self.first_training:
+        if resume:
+            Q = self.loadQ("Qmatrix")
+
+        elif self.first_training:
             Q = {}
             for state in self.env.stateSpace:
                 for action in self.env.possibleActions:
-                    # Q[state, action] = 0
-                    Q[state, action] = randint(-10, 0)    # random init
+                    Q[state, action] = 0
+                    # Q[state, action] = randint(-10, 0)    # random init
             self.first_training = False
 
         else:
@@ -175,7 +178,6 @@ class QLearning(object):
         for i in range(epochs):
             if i % int(epochs / 10) == 0:
                 print('starting game ', i)
-                # self.saveQ(Q, f"tmp/Qmatrix_epoch{i}")
 
             done = False
             epRewards = 0
@@ -208,8 +210,12 @@ class QLearning(object):
             totalRewards[i] = epRewards
             # self.env.gui.visited_cells.clear()
 
+        plt.plot(totalRewards)
+
         if plot:
-            plt.plot(totalRewards)
             plt.show()
+
+        if plot_name is not None:
+            plt.savefig(f"{plot_name}.png")
 
         self.saveQ(Q, "Qmatrix")
