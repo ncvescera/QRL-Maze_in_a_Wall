@@ -1,4 +1,3 @@
-from GridWorld import GridWorld
 from random import randint, seed
 import numpy as np
 from os import path, mkdir
@@ -37,9 +36,8 @@ def generate_testing(dim: int):
         walls = randint(1, int(w * h / 2) - 1)
 
         grid = generate_grid(w, h, walls=walls)
-        env = GridWorld(grid=grid)
 
-        np.savetxt(file_name, env.grid, delimiter=" ", fmt='%i')
+        np.savetxt(file_name, grid, delimiter=" ", fmt='%i')
 
 
 def generate_training(dim: int):
@@ -54,9 +52,8 @@ def generate_training(dim: int):
         walls = randint(1, int(w * h / 2) - 1)
 
         grid = generate_grid(w, h, walls=walls)
-        env = GridWorld(grid=grid)
 
-        np.savetxt(file_name, env.grid, delimiter=" ", fmt='%i')
+        np.savetxt(file_name, grid, delimiter=" ", fmt='%i')
 
 
 if __name__ == "__main__":
