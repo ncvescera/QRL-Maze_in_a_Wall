@@ -7,21 +7,14 @@ from maze_utils import is_solvable
 class GridWorld(object):
 
     # TODO: fare in modo di creare matrici random senza seed
-    def __init__(self, m=9, n=9, walls=10, grid=None, seeded=False):
+    def __init__(self, grid, seeded=False):
         # sezione per la generazione dei seed
         if seeded:
             np.random.seed(22)
             random.seed(22)
 
-        # dimensione matrice
-        self.m = m
-        self.n = n
-
-        if grid is not None:
-            self.grid = grid
-            self.m, self.n = self.grid.shape
-        else:
-            self.grid = self.generate_grid(walls)
+        self.grid = grid
+        self.m, self.n = self.grid.shape    # dimensione matrice
 
         # definizione cella goal
         self.goal = (self.m * self.n) - 1
@@ -50,38 +43,6 @@ class GridWorld(object):
 
         # inizializzo l'oggetto responsabile della GUI
         self.gui = None
-
-    def generate_grid(self, walls=10) -> np.ndarray:
-        """
-        Genera una matrice di dimensione m x n con un numero di muri pari a walls.
-        Fa attenzione a non posizionare muri nella cella goa le start.
-        :param walls: numero di muri da inserire nella matrice  # TODO: rendere una percentuale
-        :return: matrice di dimensione m x n con muri
-        """
-
-        if walls >= (self.m * self.n / 2):
-            print("Hai scelto troppi muri, non è possibile generare un labirinto esplorabile !!!")
-            exit()
-
-        solvable = False
-        while not solvable:
-            grid = np.zeros((self.m, self.n), dtype=int)  # matrice piena di 0
-
-            for _ in range(walls):
-                # genera a caso una posizione dove inserire il muro
-                x = random.randint(0, self.m - 1)
-                y = random.randint(0, self.n - 1)
-
-                # se la cella scelta è il goal o lo stato iniziale la rigenera
-                while (x == 0 and y == 0) or (x == (self.m - 1) and y == (self.n - 1)):
-                    x = random.randint(0, self.m - 1)
-                    y = random.randint(0, self.n - 1)
-
-                grid[x][y] = 1  # aggiunge il muro
-
-            solvable = is_solvable(grid)
-
-        return grid
 
     def is_terminal_state(self, state: int) -> bool:
         """
@@ -238,8 +199,9 @@ class GridWorld(object):
         :param state: stato da convertire
         :return: intero rappresentante lo stato
         """
-        # "".join([str(x) for x in state])
-        return int("".join(map(str, state)), 2)
+
+        return int("".join([str(x) for x in state]), 2)
+        # return int("".join(map(str, state)), 2)
 
     def calculate_next_state(self, action, next_position) -> int:
         """
