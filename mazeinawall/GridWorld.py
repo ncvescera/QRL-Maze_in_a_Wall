@@ -303,39 +303,16 @@ class GridWorld(object):
 
         def cli_render():
             """
-            Stampa la matrice nel terminale
+            Stampa la matrice su terminale
+
+            :return: True sempre dato che non c'e' una finestra di pygame da chiudere
             """
 
-            # variabili per stampare la matrice
-            to_print = ""   # stringa da stampare alla fine
+            # Inizializza l'oggetto GUI solo quando serve per evitare spreco di risorse
+            if self.gui is None:
+                self.gui = GUI(self.grid)
 
-            spaces = " " * 5    # spazi tra le celle
-            line_between_spaces = ("| " + " " * (self.n + len(spaces) * (self.n - 1))) + " |\n"  # linea vuota tra le celle
-            horizontal_line = "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"          # bordo della matrice
-            x, y = self.get_agent_row_column()  # posizione dell'agente
-
-            # stampa la matrice
-            to_print += horizontal_line         # stampa il bordo superiore
-            for row in range(self.m):
-                to_print += "| "
-                for col in range(self.n):
-                    if row == x and col == y:
-                        to_print += f"A{spaces}"                      # disegna agente
-                    elif row == self.m - 1 and col == self.n - 1:
-                        to_print += f"o{spaces}"                      # disegna goal
-                    elif self.grid[row][col] == 1:
-                        to_print += f"X{spaces}"                      # disegna muro
-                    else:
-                        to_print += f"-{spaces}"                      # disegna spazio vuoto
-
-                to_print = to_print[:-len(spaces)]  # toglie l'ultimo spazio
-                to_print += " |\n"
-                to_print += line_between_spaces
-
-            to_print = to_print[:-len(line_between_spaces)]                         # toglie l'ultima riga
-            to_print += "  " + "-" * (self.n + len(spaces) * (self.n - 1)) + "\n"   # stampa il bordo inferiore
-
-            print(to_print)
+            return self.gui.cli(self.get_agent_row_column())
 
         def gui_render() -> bool:
             """
@@ -344,7 +321,7 @@ class GridWorld(object):
             :return: False se l'utente ha chiuso la finestra, True altrimenti
             """
 
-            # La prima volta che viene chiamato il metodo render inizializza pygame.
+            # Inizializza l'oggetto GUI solo quando serve per evitare spreco di risorse
             # Evita di generare una finestra di pygame quando non richiesto
             if self.gui is None:
                 self.gui = GUI(self.grid)
@@ -355,8 +332,7 @@ class GridWorld(object):
             is_alive = gui_render()
 
         else:
-            cli_render()
-            is_alive = True  # ritorna sempre True dato che non c'è una finestra di pygame
+            is_alive = cli_render()  # ritorna sempre True dato che non c'è una finestra di pygame
 
         return is_alive
 
