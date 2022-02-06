@@ -1,6 +1,6 @@
 from GridWorld import GridWorld
 from QLearning import QLearning
-from maze_utils import grid_from_file, generate_grid
+from maze_utils import grid_from_file
 from os import walk
 
 
