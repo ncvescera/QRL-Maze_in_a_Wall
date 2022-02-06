@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import sleep
 from os import system
-from random import randint
 from datetime import datetime
 
 
@@ -104,7 +103,12 @@ class QLearning(object):
             command = input("Return: " + str(totReward) + " ExecuteNext?(y/n/uP/dOWN/lEFT/riGTH):")
             while command != 'n':
                 if command == 'y':
-                    action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
+                    action = self.maxAction(
+                        Q,
+                        self.env.state_to_int(self.env.get_state()),
+                        self.env.possibleActions,
+                        in_execution=True
+                    )
                 elif command == 'u':
                     action = 'U'
                 elif command == 'd':
@@ -125,7 +129,13 @@ class QLearning(object):
         else:  # esecuzione automatica
             alive = True
             while alive:
-                action = self.maxAction(Q, self.env.state_to_int(self.env.get_state()), self.env.possibleActions)
+                action = self.maxAction(
+                    Q,
+                    self.env.state_to_int(self.env.get_state()),
+                    self.env.possibleActions,
+                    in_execution=True
+                )
+
                 observationNext, reward, done, info = self.env.step(action)
                 totReward += reward
 
