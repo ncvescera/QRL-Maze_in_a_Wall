@@ -30,7 +30,7 @@ class GUI:
 
         # inizializza la finestra di pygame
         self.surface = None
-        self.__init_pygame()
+        # self.__init_pygame()
 
     def __init_pygame(self):
         """
@@ -51,6 +51,9 @@ class GUI:
         :param agent_pos: posizione dell'agente
         :return: False se l'utente ha chiuso la finestra prima della fine, True altrimenti
         """
+
+        if self.surface is None:
+            self.__init_pygame()
 
         agent_x, agent_y = agent_pos
 
@@ -84,6 +87,44 @@ class GUI:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
+
+        return True
+
+    def cli(self, agent_pos: tuple) -> bool:
+        """
+        Stampa la matrice nel terminale
+        """
+
+        # variabili per stampare la matrice
+        to_print = ""  # stringa da stampare alla fine
+
+        spaces = " " * 5  # spazi tra le celle
+        line_between_spaces = ("| " + " " * (self.y + len(spaces) * (self.y - 1))) + " |\n"  # linea vuota tra le celle
+        horizontal_line = "  " + "-" * (self.y + len(spaces) * (self.y - 1)) + "\n"  # bordo della matrice
+        x, y = agent_pos    # posizione dell'agente
+
+        # stampa la matrice
+        to_print += horizontal_line  # stampa il bordo superiore
+        for row in range(self.x):
+            to_print += "| "
+            for col in range(self.y):
+                if row == x and col == y:
+                    to_print += f"A{spaces}"  # disegna agente
+                elif row == self.x - 1 and col == self.y - 1:
+                    to_print += f"o{spaces}"  # disegna goal
+                elif self.matrix[row][col] == 1:
+                    to_print += f"X{spaces}"  # disegna muro
+                else:
+                    to_print += f"-{spaces}"  # disegna spazio vuoto
+
+            to_print = to_print[:-len(spaces)]  # toglie l'ultimo spazio
+            to_print += " |\n"
+            to_print += line_between_spaces
+
+        to_print = to_print[:-len(line_between_spaces)]  # toglie l'ultima riga
+        to_print += "  " + "-" * (self.y + len(spaces) * (self.y - 1)) + "\n"  # stampa il bordo inferiore
+
+        print(to_print)
 
         return True
 
