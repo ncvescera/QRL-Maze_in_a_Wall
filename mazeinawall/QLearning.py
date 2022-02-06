@@ -230,4 +230,6 @@ class QLearning(object):
         if plot_name is not None:
             plt.savefig(f"{plot_name}-{datetime.now().strftime('%H:%M:%S').replace(':', '_')}.png")
 
+        plt.clf()   # ripulisce la figura attuale evitando di stampare piu' grafici uno sopra l'altro
+
         self.saveQ(Q, "Qmatrix")

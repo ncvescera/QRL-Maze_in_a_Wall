@@ -8,9 +8,9 @@ from os import walk
 dataset = "training"
 
 # training values
-epochs = 10000
+epochs = 80000
 steps = 1500
-ALPHA = 1.0
+ALPHA = 0.1
 GAMMA = 1.0
 EPS = 0.9
 

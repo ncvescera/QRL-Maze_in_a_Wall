@@ -1,6 +1,9 @@
 from GridWorld import GridWorld
 from QLearning import QLearning
 from maze_utils import grid_from_file, maze_filename
+from os import walk
+
+dataset = "testing"
 
 
 def testing():
@@ -36,8 +39,25 @@ def testing():
     scelta = input("GUI? (Y/n): ").lower()
     gui = False if scelta == 'n' else True
 
-    # avvio la fase di esecuzione
-    QL.execute(step_by_step=step_by_step, gui=gui)
+    scelta = input("Utilizzare dataset di testing (y/N): ").lower()
+    if scelta == 'y':
+        # ottengo tutti i file nella cartella del dataset
+        filenames = next(walk(dataset), (None, None, []))[2]
+        for file in filenames:
+            grid, message = grid_from_file(f"{dataset}/{file}")
+
+            if grid is None:
+                print(f"Errore in {file}: {message}")
+
+            print(f"Caricato labirinto {grid.shape}")
+
+            env = GridWorld(grid=grid)
+            QL.env = env
+            QL.execute(step_by_step=step_by_step, gui=gui)
+
+    else:
+        # avvio la fase di esecuzione
+        QL.execute(step_by_step=step_by_step, gui=gui)
 
 
 if __name__ == '__main__':
