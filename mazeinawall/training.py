@@ -1,11 +1,10 @@
 from GridWorld import GridWorld
 from QLearning import QLearning
-from maze_utils import grid_from_file
+from maze_utils import grid_from_file, maze_filename
 from os import walk
 
 
 dataset = "training"
-existing_matrix = "matrix"
 
 # training values
 epochs = 10000
@@ -22,12 +21,12 @@ def training():
 
     print("Training Script")
 
-    scelta = input("Riprendere allenamento ? (Y/n)")
+    scelta = input("Riprendere allenamento ? (Y/n)").lower()
     resume = True if scelta != 'n' else False
 
-    scelta = input("Caricare matrice gia' esistente ? (Y/n)")
+    scelta = input("Caricare matrice gia' esistente ? (Y/n)").lower()
     if scelta != 'n':
-        grid, message = grid_from_file(existing_matrix)
+        grid, message = grid_from_file(maze_filename)
 
         if grid is None:
             print(message)
