@@ -1,11 +1,9 @@
-from os import lseek
-from typing import Dict, Tuple, Any, Union
-
 import numpy as np
 import matplotlib.pyplot as plt
 from time import sleep
 from os import system
 from random import randint
+from datetime import datetime
 
 
 class QLearning(object):
@@ -143,7 +141,7 @@ class QLearning(object):
                 sleep(sleep_time)  # tempo di attesa per visualizzare lo stato successivo
                 system("clear")
 
-    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True, resume=False, plot_name :str = None):
+    def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True, resume=False, plot_name: str = None):
         """
         Funzione che effettua il traning dell'agente con la possibilita' di modificare alcuni parametri.
         Alla fine effettua il salvataggio dela Qmatrix in un file.
@@ -154,6 +152,8 @@ class QLearning(object):
         :param GAMMA: discount factor
         :param EPS: epsilon-greedy
         :param plot: stampa con matplotlib la learning curve
+        :param plot_name: il nome da dare alla foto .png con il grafico del training
+        :param resume: se True, invece di inizializzare una nuova matrice Q ricarica quella esistente e la modifica
         """
 
         # inizializing Q(state, action) matrix to zero
@@ -216,6 +216,6 @@ class QLearning(object):
             plt.show()
 
         if plot_name is not None:
-            plt.savefig(f"{plot_name}.png")
+            plt.savefig(f"{plot_name}-{datetime.now().strftime('%H:%M:%S').replace(':', '_')}.png")
 
         self.saveQ(Q, "Qmatrix")
