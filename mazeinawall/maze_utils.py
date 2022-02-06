@@ -1,6 +1,8 @@
 import numpy as np
 from random import randint
 
+maze_filename = "matrix"
+
 
 def is_solvable(maze, start: tuple[int, int] = None, goal: tuple[int, int] = None) -> bool:
     """
