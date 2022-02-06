@@ -36,7 +36,7 @@ def training():
     resume = True if scelta != 'n' else False
 
     # scelta per utilizzo di singola matrice o dataset
-    scelta = input("Caricare matrice gia' esistente ? (Y/n)").lower()
+    scelta = input("Caricare labirinto esistente ? (Y/n)").lower()
     if scelta != 'n':
         print(f"Avvio training sul labirinto esistente")
 
