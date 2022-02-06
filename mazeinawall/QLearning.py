@@ -11,13 +11,14 @@ class QLearning(object):
         self.env = env
         self.first_training = True
 
-    def maxAction(self, Q, state, actions: list[str]) -> str:
+    def maxAction(self, Q, state, actions: list[str], in_execution=False) -> str:
         """
         Trova l'azione che ha valore massimo per uno stato.
 
         :param Q: matrice Q
         :param state: stato
         :param actions: possibili azioni
+        :param in_execution: se True, quando ci sono azioni con gli stessi valori ne viene scelta una a caso
         :return:
         """
 
@@ -25,11 +26,12 @@ class QLearning(object):
         action = np.argmax(values)
 
         # TODO: riscrivere meglio
-        # prende a caso un'azione se ce ne sono due uguali
-        # prima prendeva sempre la prima
-        #tmp = [i for i, x in enumerate(values) if x == values[action]]
-        #if len(tmp) > 1:
-        #    action = np.random.choice(tmp)
+        # prende a caso un'azione se ce ne sono due o piu' uguali
+        # solo nella fase di execution !!!
+        if in_execution:
+            tmp = [i for i, x in enumerate(values) if x == values[action]]
+            if len(tmp) > 1:
+                action = np.random.choice(tmp)
 
         return actions[action]
 
