@@ -1,4 +1,4 @@
-from GridWorld import GridWorld
+from MazeEnv import MazeEnv
 from QLearning import QLearning
 from maze_utils import grid_from_file, maze_filename
 from os import walk
@@ -78,7 +78,7 @@ def training():
 
         print(f"Caricato labirinto {grid.shape}")
 
-        env = GridWorld(grid=grid)
+        env = MazeEnv(grid=grid)
         QL = QLearning(env)
         QL.training(epochs=epochs, steps=steps, ALPHA=alpha, GAMMA=gamma, EPS=eps, plot=True, resume=resume)
 
@@ -97,7 +97,7 @@ def training():
 
             print(f"Caricato labirinto {grid.shape}")
 
-            env = GridWorld(grid=grid)
+            env = MazeEnv(grid=grid)
             QL.env = env
             QL.training(epochs=epochs, steps=steps, ALPHA=alpha, GAMMA=gamma, EPS=eps, plot=False, resume=resume, plot_name=file)
 
