@@ -9,7 +9,7 @@ training_folder = "training"
 testing_folder = "testing"
 
 tot_elem_training = 100  # numero di matrici da generare
-tot_elem_testing = 10    # numero di matrici da generare
+tot_elem_testing = 20    # numero di matrici da generare
 max_w = 10               # massima altezza
 max_h = 10               # massima lunghezza
 min_w = 3                # minima altezza

@@ -19,6 +19,11 @@ def testing():
 
     print("Execute\n")
 
+    scelta = input("Avviare la fase di Evaluation ? (y/N): ").lower()
+    if scelta == 'y':
+        evaluate()
+        return
+
     # carica labirinto da file
     grid, message = grid_from_file(maze_filename)
 
@@ -58,6 +63,26 @@ def testing():
     else:
         # avvio la fase di esecuzione
         QL.execute(step_by_step=step_by_step, gui=gui)
+
+
+def evaluate():
+    QL = QLearning(None)
+
+    tot = 0
+    filenames = next(walk(dataset), (None, None, []))[2]
+    for file in filenames:
+        grid, message = grid_from_file(f"{dataset}/{file}")
+
+        if grid is None:
+            print(f"Errore in {file}: {message}")
+
+        print(f"Caricato labirinto {grid.shape}")
+
+        env = MazeEnv(grid=grid)
+        QL.env = env
+        tot += QL.execute(step_by_step=False, sleep_time=0.0, gui=False)
+
+    print(f"{tot/len(filenames)}")
 
 
 if __name__ == '__main__':
