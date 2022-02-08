@@ -81,7 +81,7 @@ class QLearning(object):
 
         return Q
 
-    def execute(self, step_by_step=False, sleep_time=0.5, gui=True):
+    def execute(self, step_by_step=False, sleep_time=0.5, maxk=30, gui=True):
         """
         Permette l'esecuzione del Q-Learning mostrando a schermo i movimenti dell'agente con il reward ottenuto.
         Permette l'esecuzione step-by-step o automatica.
@@ -128,7 +128,8 @@ class QLearning(object):
 
         else:  # esecuzione automatica
             alive = True
-            while alive:
+            counter = 0
+            while alive and counter < maxk:
                 action = self.maxAction(
                     Q,
                     self.env.state_to_int(self.env.moore()),
@@ -144,14 +145,18 @@ class QLearning(object):
                 # se l'utente chiude la finestra prima della fine dell'esecuzione il programma termina
                 alive = self.env.render(gui=gui)
 
+                counter += 1
+
                 if done:
                     print("Return:" + str(totReward))
                     if gui:
                         self.env.gui.wait()  # aspetta che l'utente chiuda la finestra
-                    break
+                    return True
 
                 sleep(sleep_time)  # tempo di attesa per visualizzare lo stato successivo
                 system("clear")
+
+            return False
 
     def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True, resume=False, plot_name: str = None):
         """
