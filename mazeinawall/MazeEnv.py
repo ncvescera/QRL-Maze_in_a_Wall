@@ -4,15 +4,10 @@ from GUI import GUI
 from maze_utils import is_solvable
 
 
-class GridWorld(object):
+class MazeEnv(object):
 
     # TODO: fare in modo di creare matrici random senza seed
-    def __init__(self, grid, seeded=False):
-        # sezione per la generazione dei seed
-        if seeded:
-            np.random.seed(22)
-            random.seed(22)
-
+    def __init__(self, grid):
         self.grid = grid
         self.m, self.n = self.grid.shape    # dimensione matrice
 
@@ -36,7 +31,6 @@ class GridWorld(object):
 
         # posizione dell'agente e stato iniziale
         self.agentPosition = 0
-        self.set_state(self.agentPosition)
 
         # init del reward, sarà cambiato in seguito
         self.reward = 0
@@ -44,7 +38,7 @@ class GridWorld(object):
         # inizializzo l'oggetto responsabile della GUI
         self.gui = None
 
-    def is_terminal_state(self, state: int) -> bool:
+    def is_goal(self, state: int) -> bool:
         """
         Controlla se il stato passato è uno stato finale
 
@@ -54,46 +48,37 @@ class GridWorld(object):
 
         return state in self.stateGoals
 
-    def get_agent_row_column(self, new_state: int = None):
+    def get_agent_row_column(self, new_cell: int = None):
         """
-        Ritorna le coordinate x, y della posizione dell'agente se new_state è None,
-        altrimenti ritorna le coordinate x, y della posizione nuova dell'agente in new_state
+        Ritorna le coordinate x, y della posizione dell'agente se new_cell è None,
+        altrimenti ritorna le coordinate x, y della posizione nuova dell'agente in new_cell
 
-        :param new_state: nuovo stato dell'agente
+        :param new_cell: nuova cella (id) in cui si trovera' l'agente
         :return: coordinate x, y della posizione dell'agente
         """
 
         # per prendere la x si effettua la divisione e si prende solo la parte intera
         # così questo calcolo funziona per tutte le matrici.
-        if new_state is None:
+        if new_cell is None:
             x = int(self.agentPosition / self.n)
             y = self.agentPosition % self.n
 
             return x, y
         else:
-            x = int(new_state / self.n)
-            y = new_state % self.n
+            x = int(new_cell / self.n)
+            y = new_cell % self.n
 
             return x, y
 
-    def set_state(self, state: int):
+    def off_grid_move(self, new_cell) -> bool:
         """
-        Imposta lo stato dell'agente.
-        :param state: nuovo stato da impostare
-        """
+        Controlla se la nuova cella (id) è fuori dalla griglia
 
-        self.agentPosition = state
-
-    def off_grid_move(self, new_state, old_state) -> bool:
-        """
-        Controlla se il nuovo stato è fuori dalla griglia
-
-        :param new_state: nuovo stato da controllare
-        :param old_state: stato precedente alla mossa
+        :param new_cell: cella da controllare
         :return: True se è fuori dalla griglia, False altrimenti
         """
 
-        if new_state not in range(self.n * self.m):  # se il nuovo stato non appartiene agli stati
+        if new_cell not in range(self.n * self.m):  # se il nuovo stato non appartiene agli stati
             return True
 
         else:
@@ -102,6 +87,7 @@ class GridWorld(object):
     def is_wall_colliding(self, cell) -> bool:
         """
         Controlla se sta cercando di andare contro un muro
+
         :param cell: nuovo stato da controllare
         :return: True se sta cercando di andare contro un muro, False altrimenti
         """
@@ -110,7 +96,21 @@ class GridWorld(object):
         else:
             return False
 
-    def get_state(self, next_position: int = None) -> np.array:
+    def moore(self, next_position: int = None) -> np.array:
+        """
+        Ritorna il vicinato di Moore dato l'id di una cella.
+        Se next_position viene specificato, ritorna il vicinato di quella cella, altrimenti
+        calcola il vicinato dell'agente.
+
+        Il vicinato ha questo formato:
+
+            [1, 1, 1, 0, 0, 1, 0, 0]
+            UL  UP UR L  R  DL D  DR
+
+        :param next_position: nuova posizione dove calcolare il vicinato
+        :return: vicinato di Moore sotto forma di array
+        """
+
         if next_position is not None:
             x, y = self.get_agent_row_column(next_position)
         else:
@@ -137,7 +137,7 @@ class GridWorld(object):
 
         return np.array(vicini)
 
-    def get_state_old(self, next_position: int = None) -> np.array:
+    def neuman(self, next_position: int = None) -> np.array:
         """
         Ottiene lo stato dell'agente. Se next_position è diverso da "default", ottiene il nuovo stato dell'agente.
         Lo stato/osservazione è un array del tipo [0, 1, 1, 0].
@@ -201,41 +201,33 @@ class GridWorld(object):
         """
 
         return int("".join([str(x) for x in state]), 2)
-        # return int("".join(map(str, state)), 2)
 
     def calculate_next_state(self, action, next_position) -> int:
         """
         Calcola il nuovo stato dell'agente in base all'azione e alla nuova posizione.
         In base all'azione calcola anche il reward.
 
-        Ricordo che state è un array del tipo [0, 1, 1, 0].
-            Dove :
-                [0] -> posizione sopra l'agente (UP)
-                [1] -> posizione a destra l'agente (RIGHT)
-                [2] -> posizione sotto all'agente (DOWN)
-                [3] -> posizione a sinistra dell'agente (LEFT)
-
         :param action: azione che ha eseguito l'agente
         :param next_position: nuova posizione dove si troverà l'agente
         :return: intero che rappresenta lo stato
         """
 
-        state = self.get_state()        # ottengo lo stato attuale dell'agente
+        state = self.moore()            # ottengo lo stato attuale dell'agente
 
         to_return = None                # valore da ritornare alla fine
         update_agent_position = True    # controllo se aggiornare la posizione dell'agente
 
         # controlla se si è spostato fuori dalla griglia, in caso si considera una collisione col muro
         # se no effettua le azioni in else
-        if self.off_grid_move(next_position, self.agentPosition):
+        if self.off_grid_move(next_position):
             update_agent_position = False
             self.reward = -5
-            to_return = self.state_to_int(state)
+            to_return = state
 
         else:
             # reward e risultato uguali per tutti se non impatta contro un muro
-            self.reward = 10 if self.is_terminal_state(next_position) else -1
-            to_return = self.state_to_int(self.get_state(next_position))
+            self.reward = 10 if self.is_goal(next_position) else -1
+            to_return = self.moore(next_position)
 
             # controllo se impatta contro un muro: se si, ritorno lo stato corrente e reward -5
             # "ritorno lo stato corrente" = l'agente non si muove e ha un reward di -5 (azione male male)
@@ -243,45 +235,46 @@ class GridWorld(object):
                 if self.is_wall_colliding(state[1]):
                     update_agent_position = False
                     self.reward = -5
-                    to_return = self.state_to_int(state)
+                    to_return = state
             elif action == 'D':
                 if self.is_wall_colliding(state[6]):
                     update_agent_position = False
                     self.reward = -5
-                    to_return = self.state_to_int(state)
+                    to_return = state
             elif action == 'L':
                 if self.is_wall_colliding(state[3]):
                     update_agent_position = False
                     self.reward = -5
-                    to_return = self.state_to_int(state)
+                    to_return = state
             elif action == 'R':
                 if self.is_wall_colliding(state[4]):
                     update_agent_position = False
                     self.reward = -5
-                    to_return = self.state_to_int(state)
+                    to_return = state
 
             # se True, vuol dire che l'agente non è andato contro un muro e quindi si può spostare
             if update_agent_position:
                 self.agentPosition = next_position
 
-        return to_return
+        return self.state_to_int(to_return)
 
     def step(self, action: str) -> tuple[int, int, bool, object]:
         """
         Data un azione la esegue.
+
         :param action: azione da eseguire. Carattere singolo che rappresenta la key di actionSpace
         :return: nuovo stato, reward, done, info
         """
 
         # calcola la nuova posizione dell'agente
         resulting_position = self.agentPosition + self.actionSpace[action]
-        next_state = self.calculate_next_state(action, resulting_position)
+        next_int_state = self.calculate_next_state(action, resulting_position)
 
-        actual_state = self.get_state()
+        actual_state = self.moore()
         info = {str(actual_state), str(self.state_to_int(actual_state))}
 
         # effettua la mossa
-        return next_state, self.reward, self.is_terminal_state(resulting_position), info
+        return next_int_state, self.reward, self.is_goal(resulting_position), info
 
     def reset(self) -> int:
         """
@@ -292,7 +285,7 @@ class GridWorld(object):
 
         self.agentPosition = 0  # l'agente viene rimesso allo stato iniziale
 
-        return self.state_to_int(self.get_state())
+        return self.state_to_int(self.moore())
 
     def render(self, gui=True) -> bool:
         """

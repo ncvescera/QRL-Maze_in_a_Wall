@@ -1,4 +1,4 @@
-from GridWorld import GridWorld
+from MazeEnv import MazeEnv
 from QLearning import QLearning
 from maze_utils import grid_from_file, maze_filename
 from os import walk
@@ -28,7 +28,7 @@ def testing():
         return
 
     # creo l'ambiente e l'algoritmo per il qlearning
-    env = GridWorld(grid=grid)
+    env = MazeEnv(grid=grid)
     QL = QLearning(env)
 
     # scelta per esecuzione step-by-step
@@ -51,7 +51,7 @@ def testing():
 
             print(f"Caricato labirinto {grid.shape}")
 
-            env = GridWorld(grid=grid)
+            env = MazeEnv(grid=grid)
             QL.env = env
             QL.execute(step_by_step=step_by_step, gui=gui)
 

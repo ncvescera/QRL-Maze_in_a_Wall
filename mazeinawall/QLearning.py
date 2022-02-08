@@ -105,7 +105,7 @@ class QLearning(object):
                 if command == 'y':
                     action = self.maxAction(
                         Q,
-                        self.env.state_to_int(self.env.get_state()),
+                        self.env.state_to_int(self.env.moore()),
                         self.env.possibleActions,
                         in_execution=True
                     )
@@ -131,7 +131,7 @@ class QLearning(object):
             while alive:
                 action = self.maxAction(
                     Q,
-                    self.env.state_to_int(self.env.get_state()),
+                    self.env.state_to_int(self.env.moore()),
                     self.env.possibleActions,
                     in_execution=True
                 )
@@ -177,7 +177,6 @@ class QLearning(object):
             for state in self.env.stateSpace:
                 for action in self.env.possibleActions:
                     Q[state, action] = 0
-                    # Q[state, action] = randint(-10, 0)    # random init
             self.first_training = False
 
         else:
