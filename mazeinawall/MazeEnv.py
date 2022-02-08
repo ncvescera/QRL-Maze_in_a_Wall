@@ -1,12 +1,9 @@
 import numpy as np
-import random
 from GUI import GUI
-from maze_utils import is_solvable
 
 
 class MazeEnv(object):
 
-    # TODO: fare in modo di creare matrici random senza seed
     def __init__(self, grid):
         self.grid = grid
         self.m, self.n = self.grid.shape    # dimensione matrice
