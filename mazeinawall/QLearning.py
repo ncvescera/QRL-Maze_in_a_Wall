@@ -151,12 +151,12 @@ class QLearning(object):
                     print("Return:" + str(totReward))
                     if gui:
                         self.env.gui.wait()  # aspetta che l'utente chiuda la finestra
-                    return True
+                    return True, totReward
 
                 sleep(sleep_time)  # tempo di attesa per visualizzare lo stato successivo
                 system("clear")
 
-            return False
+            return False, totReward
 
     def training(self, epochs=50000, steps=200, ALPHA=0.1, GAMMA=1.0, EPS=1.0, plot=True, resume=False, plot_name: str = None):
         """
@@ -233,6 +233,9 @@ class QLearning(object):
 
         if plot_name is not None:
             plt.savefig(f"{plot_name}-{datetime.now().strftime('%H:%M:%S').replace(':', '_')}.png")
+
+        else:
+            plt.savefig(f"plt_training_{epochs}_{steps}.png")
 
         plt.clf()   # ripulisce la figura attuale evitando di stampare piu' grafici uno sopra l'altro
 

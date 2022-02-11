@@ -66,23 +66,43 @@ def testing():
 
 
 def evaluate():
-    QL = QLearning(None)
+    def _evaluate():
+        QL = QLearning(None)
 
-    tot = 0
-    filenames = next(walk(dataset), (None, None, []))[2]
-    for file in filenames:
-        grid, message = grid_from_file(f"{dataset}/{file}")
+        tot = 0
+        rew = 0
+        filenames = next(walk(dataset), (None, None, []))[2]
+        for file in filenames:
+            grid, message = grid_from_file(f"{dataset}/{file}")
 
-        if grid is None:
-            print(f"Errore in {file}: {message}")
+            if grid is None:
+                print(f"Errore in {file}: {message}")
 
-        print(f"Caricato labirinto {grid.shape}")
+            print(f"Caricato labirinto {grid.shape}")
 
-        env = MazeEnv(grid=grid)
-        QL.env = env
-        tot += QL.execute(step_by_step=False, sleep_time=0.0, gui=False)
+            env = MazeEnv(grid=grid)
+            QL.env = env
+            result, reward = QL.execute(step_by_step=False, sleep_time=0.0, gui=False)
 
-    print(f"{tot/len(filenames)}")
+            tot += result
+            rew += reward
+        # print(f"Acc: {tot/len(filenames)} Rew: {rew}")
+        return tot/len(filenames), rew
+
+    avg_acc = 0
+    avg_rew = 0
+    max_step = 5
+
+    for _ in range(max_step):
+        acc, rew = _evaluate()
+
+        avg_acc += acc
+        avg_rew += rew
+
+    avg_acc /= max_step
+    avg_rew /= max_step
+
+    print(f"Acc avg: {avg_acc} Rew avg: {avg_rew}")
 
 
 if __name__ == '__main__':
