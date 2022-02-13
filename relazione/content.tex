@@ -207,6 +207,17 @@ Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) 
 	\caption{Tempi di esecuzione della funzione \lstinline[style=cmd]|is_solvable()| con matrici di diversa dimensione.}
 \end{figure}
 
+% TODO: ricontrollare
+Il costo in tempo \`{e} $O(m \times n)$:
+
+\[
+	Tcosto = O(V + E) = mn + mn - n + mn - m = (mn)(3 - m - n) = O(mn)
+	
+	V = mn
+	E = (n)(m-1) + (m)(n-1)
+\]
+Anche in spazio.
+
 \begin{lstlisting}[style=python, caption={Funzione per controllare la risolvibilit\`{a} dei labirinti}]
 	def is_solvable(maze) -> bool:
 		x, y = maze.shape
