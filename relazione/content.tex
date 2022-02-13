@@ -195,7 +195,17 @@ All'interno di questo file sono presenti alcune funzioni "\textit{utilities}" pe
 
 \subsubsection{is\_solvable}
 \`{E} proprio qui che le varie matrici vengono controllate e ottengono lo stato di \textit{valide/risolvibili} (\textit{solvable}).  % TODO: controllare se le successive righe sono cazzate (esplorazione in profondita')
-Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) che percorre tutto il labirinto e ritorna \lstinline[style=cmd]|True| se l'agente riesce ad arrivare allo stato goal, altrimenti \lstinline[style=cmd]|False|. Questo controllo non intacca di molto le performance dell'algoritmo in quanto anche su matrici $10 \times 10$ il suo tempo di completamento non \`{e} rilevante confronto la fase di training o testing. % TODO: ricontrollare meglio e ampliare un po con anche il O(n).
+Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) che percorre tutto il labirinto e ritorna \lstinline[style=cmd]|True| se l'agente riesce ad arrivare allo stato goal, altrimenti \lstinline[style=cmd]|False|. Questo controllo non intacca di molto le performance dell'algoritmo in quanto anche su matrici $10 \times 10$ il suo tempo di completamento non \`{e} minimamente rilevante: %confronto la fase di training o testing. % TODO: ricontrollare meglio e ampliare un po con anche il O(n).
+
+\begin{figure}[H]
+	\centering
+   	\begin{tabular}{c | c | c | c | c | c}
+		 & $3 \times 3$ & $6 \times 6$ & $10 \times 10$ & $50 \times 50$ & $100 \times 100$\\
+		\hline
+		\textbf{Tempo} (s) & 0.0 & 0.0 & 0.0 & ? & ?\\ [2em]
+	\end{tabular}
+	\caption{Tempi di esecuzione della funzione \lstinline[style=cmd]|is_solvable()| con matrici di diversa dimensione.}
+\end{figure}
 
 \begin{lstlisting}[style=python, caption={Funzione per controllare la risolvibilit\`{a} dei labirinti}]
 	def is_solvable(maze) -> bool:
