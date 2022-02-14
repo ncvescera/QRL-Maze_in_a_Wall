@@ -1,5 +1,6 @@
 % TODO: provare a rendere indivisibili i listing con \begin{minipage}{\linewidth}
 \section{Obiettivo}
+% TODO: rivedere meglio, suona strano
 L'obiettivo di questa relazione \`{e} quello di realizzare un'implementazione di un \textbf{ambiente} di \textbf{Reinforcement Learning} per allenare un agente, tramite un algoritmo di \textbf{Q-Learning}, a muoversi in modo "\textit{intelligente}" all'interno di un labirinto, ovvero l'agente deve essere in grado di non andare a sbattere contro le mura del labirinto e possibilmente arrivare all'uscita.
 
 \section{Ipotesi iniziali e vincoli}
@@ -59,9 +60,9 @@ In breve tutti i vincoli dell'agente:
 \begin{itemize}
 	\item Pu\`{o} muoversi solo nelle \textbf{Celle Vuote}
 	\item Non pu\`{o} oltrepassare le \textbf{Celle Muro} e muoversi contro una di queste equivale a rimanere fermo sul posto
-	\item Non pu\`{o} uscire dalle mura del labirinto (non pu\`{o} andare fuori le celle della matrice e.g. $a_{-1, 0}$)
+	\item Non pu\`{o} uscire dalle mura del labirinto (non pu\`{o} andare fuori dalle celle della matrice e.g. $a_{-1, 0}$)
 	\item Non esiste \textit{l'effetto pacman}
-	\item Le azioni che pu\`{o} fare sono: \lstinline[style=cmd]|UP, DOWN, LEFT, RIGHT|
+	\item Le azioni che pu\`{o} compiere sono: \lstinline[style=cmd]|UP, DOWN, LEFT, RIGHT|
 	\item Pu\`{o} muoversi solo nelle celle a lui vicine e non in diagonale (vicinato di Von Neuman)
 \end{itemize}
 
@@ -122,7 +123,7 @@ La seguente \`{e} una breve anteprima di come si presenta la cartella del proget
 		\item \textbf{GUI}: tramite una finestra dove il labirinto viene rappresentato a colori
 		\item  \textbf{CLI}: direttamente nel terminale con soli caratteri testuali
 	\end{enumerate}
-	\item \lstinline[style=cmd]|generate_dataset.py| \`{e} responsabile della creazione del dataset: 100 labirinti generati in modo casuale con dimensione massima $10 \times 10$, minima di $3 \times 3$ ed un numero casuale di mura per il \textit{training} e 20, costruite allo stesso modo delle precedenti, per il \textit{testing/execution}.
+	\item \lstinline[style=cmd]|generate_dataset.py| \`{e} responsabile della creazione del dataset: 100 labirinti generati in modo casuale con dimensione massima $10 \times 10$, minima di $3 \times 3$ ed un numero casuale di mura, per il \textit{training} e 20, costruite allo stesso modo delle precedenti, per il \textit{testing/execution}.
 	\item \lstinline[style=cmd]|training.py| avvia la fase di \textit{training} e permette all'utente di scegliere alcuni parametri come:
 	\begin{itemize}
 		\item Numero di Epoche
@@ -133,7 +134,7 @@ La seguente \`{e} una breve anteprima di come si presenta la cartella del proget
 	In questa fase non \`{e} prevista la stampa \textit{GUI} e se utilizzato il dataset di training, per ogni matrice verr\`{a} salvato un grafico che mostra il risultato dell'allenamento.
 	\item \lstinline[style=cmd]|testing.py| permette all'utente di eseguire la fase di \textit{testing/execution} dandogli la possibilit\`{a} di scegliere:
 	\begin{itemize}
-		\item se utilizzare la modalit\`{a} \lstinline[style=cmd]|step-by-step| (possibilit\`{a} di eseguire un'azione alla volta e anche di scegliere quale azione fare per ogni stato) o l'esecuzioen automatica
+		\item se utilizzare la modalit\`{a} \lstinline[style=cmd]|step-by-step| (possibilit\`{a} di eseguire un'azione alla volta e anche di scegliere quale azione fare per ogni stato) o l'esecuzione automatica
 		\item se utilizzare la stampa \textit{GUI} o \textit{CLI}
 		\item se avviare l'esecuzione con una matrice generata dall'utente o con il dataset di testing
 	\end{itemize}
@@ -210,13 +211,16 @@ Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) 
 % TODO: ricontrollare
 Il costo in tempo \`{e} $O(m \times n)$:
 
-\[
-	Tcosto = O(V + E) = mn + mn - n + mn - m = (mn)(3 - m - n) = O(mn)
-	
-	V = mn
-	E = (n)(m-1) + (m)(n-1)
-\]
-Anche in spazio.
+\begin{center}
+	$Tcosto = O(V + E) = mn + mn - n + mn - m = (mn)(3 - m - n) = O(mn) $
+\end{center}
+$dove: $
+\begin{itemize}
+	\item $V = mn$
+	\item $E = (n)(m-1) + (m)(n-1)$
+\end{itemize}
+
+Anche il costo in spazio \`{e} identico in quanto la lista \lstinline[style=cmd]|seen| sar\`{a} grande al pi\`{u} $m \times n$.
 
 \begin{lstlisting}[style=python, caption={Funzione per controllare la risolvibilit\`{a} dei labirinti}]
 	def is_solvable(maze) -> bool:
@@ -286,7 +290,7 @@ La funzione \lstinline[style=cmd]|generate_grid| riesce a creare labirinti, di d
 
 \[maxWalls = \frac{m * n}{2}\]
 
-Superando $maxWall$ si potranno andare a generare barriere  di mura insuperabili dall'agente, ma restando sotto questo limite \`{e} sempre certo che questo fenomeno non accadr\`{a} mai.
+Superando $maxWalls$ si potranno andare a generare barriere  di mura insuperabili dall'agente, ma restando sotto questo limite \`{e} sempre certo che questo fenomeno non accadr\`{a} mai.
 
 \begin{lstlisting}[style=python, caption={Funzione per la generazione di labirinti casuali}]
 	def generate_grid(m, n, walls=10) -> np.ndarray:
@@ -504,7 +508,7 @@ Questo metodo \`{e} in grado, tramite calcoli banali, di ritornare le coordinate
 
 \subsubsection{moore}
 Qui viene calcolato il vicinato di Moore partendo dalla posizione dell'agente o da una data posizione.
-Se l'agente si trova vicino ad un bordo della matrice, le celle che fuoriuscirebbero vengono viste come muri:
+Se l'agente si trova vicino ad un bordo della matrice, le celle che fuoriuscirebbero vengono viste come mura:
 \begin{figure}[H]
 	\begin{tabular}{m{20em} m{20em}}
 		\begin{equation*}
@@ -775,7 +779,7 @@ Questo metodo si occupa della gestione della fase di \textit{training}. \`{E} po
 	\item \textbf{eps}:  epsilon-greedy
 \end{itemize}
 
-Per prima cosa viene inizializzata la matrice Q con tutti 0 (righe 3 - 6), poi viene mostrato a video il labirinto che si sta esplorando (righe 8 - 9) ed infine viene effettuato l'allenamento (righe 11 - 49). Durante questa parte, l'agente inizialmente tende ad esplorare (\textit{exploration phase}) compiendo azioni casuali per vedere "cosa succede", poi, con l'esperienza acquisita, tender\`{a} a convergere sempre nello stato goal (se riesce a trovarlo) passando quindi all'\textit{exploitation phase}. Il tutto \`{e} possibile grazie alle righe 38 - 41 che vanno a variare il parametro \lstinline[style=cmd]|esp| al completamento di ogni epoca. Questa "esperienza" si traduce in pratica con l'aggiornamento dei valori di ogni cella della matrice Q (righe 32 - 34).\\
+Per prima cosa viene inizializzata la matrice Q con tutti 0 (righe 3 - 6), poi viene mostrato a video il labirinto che si sta esplorando (righe 8 - 9) ed infine viene effettuato l'allenamento (righe 11 - 49). Durante questa parte, l'agente inizialmente tende ad esplorare (\textit{exploration phase}) compiendo azioni casuali per vedere "cosa succede", poi, con l'esperienza acquisita, tender\`{a} a convergere sempre nello stato goal (se riesce a trovarlo) passando quindi all'\textit{exploitation phase}. Il tutto \`{e} possibile grazie alle righe 38 - 41 che vanno a variare il parametro \lstinline[style=cmd]|eps| al completamento di ogni epoca. Questa "esperienza" si traduce in pratica con l'aggiornamento dei valori di ogni cella della matrice Q (righe 32 - 34).\\
 
 Al termine dell'allenamento viene mostrato a video un grafico riassuntivo con tutti i punteggi totalizzati (somma di tutti i reward ottenuti) per ogni epoca.\\
 
@@ -995,7 +999,7 @@ Qui risiede la funzione per avviare la fase di \textit{testing/execution} facend
 	\item Ripete questa procedura per 5 volte ottenendo una media finale
 \end{itemize}
 
-Questo indice permetter\`{a} in futuro di confrontare diversi allenamenti (quindi differenti matrici Q) tra di loro e capire quindi qual \`{e} il migliore.\\
+Questo indice permetter\`{a} in futuro di confrontare diversi allenamenti (differenti matrici Q) tra di loro e capire quindi qual \`{e} il migliore.\\
 
 \begin{lstlisting}[style=python, caption={Funzione per la valutazione dell'apprendimento}]
 def evaluate():
@@ -1457,6 +1461,7 @@ Mettendo a confronto le due matrici Q possiamo vedere come quella attuale risult
 \end{minipage}
 
 \section{Riflessioni finali}
+\label{sec:riflessioni}
 
 Con \hyperref[sec:terzo]{Terzo Allenamento} l'agente sa muoversi abbastanza bene all'interno dei labirinti, se questi non risultano troppo complessi, riuscir\`{a} quasi sicuramente a trovare la soluzione.
 Ci sono per\`{o} alcuni casi che non \`{e} in grado di affrontare che verranno elencati di seguito:
@@ -1474,7 +1479,7 @@ Prendiamo, per esempio, la seguente situazione: tra l'agente ed il goal ci sono 
 % TODO: ricontrollare i calcoli
 \[\frac{1}{4} * \frac{1}{4} * \frac{1}{4} * \frac{1}{4} = {\frac{1}{4}}^4 = \frac{1}{64} = 0.015 = 1.5\%\]
 
-La probabilit\`{a} di superare con successo 4 stati inesplorati consecutivi \`{e} estremamente bassa ! Le modifiche apportate alla funzione \lstinline[style=cmd]|maxAction()| servono per gestire stati inesplorati isolati e impedire all'agetne di bloccarsi, ma quando abbiamo troppo stati inesplorati consecutivi (gi\`{a} 4 risultano eccessivi)  queste non possono fare molto.
+La probabilit\`{a} di superare con successo 4 stati inesplorati consecutivi \`{e} estremamente bassa ! Le modifiche apportate alla funzione \lstinline[style=cmd]|maxAction()| servono per gestire stati inesplorati isolati e impedire all'agetne di bloccarsi, ma quando abbiamo troppi stati inesplorati consecutivi (gi\`{a} 4 risultano eccessivi)  queste non possono fare molto.
 
 \subsection{Stati Ambigui}
 
@@ -1526,5 +1531,5 @@ Lo stesso discorso vale anche per pattern di mura del tipo: "tunnel a destra" e 
 
 % TODO: aggiungere ref alle parole allenamenti
 % TODO:rileggere meglio
-Dopo aver eseguito un primo allenamento iniziale, aver preso visione e corretto i vari problemi con i successivi due allenamenti, aver confrontato le performance dell'agente per oguno di questi, posso concoludere che, tramite QLearning, sono riuscito a far apprendere all'agente come evadere da labirinti di modeste dimensioni e con una disposizione delle mura abbastanza basilare, ma con evidenti limiti quando la complessit`\{a} delle matrici aumenta e con la completa incapacit\`{a} di questultimo in presenza di "salite/discese" o "tunnel" (vedi sezioni precedenti). 
+Dopo aver eseguito un primo allenamento iniziale, aver preso visione e corretto i vari problemi con i successivi due allenamenti, aver confrontato le performance dell'agente per oguno di questi, posso concoludere che, tramite QLearning, sono riuscito a far apprendere all'agente come evadere da labirinti di modeste dimensioni e con una disposizione delle mura abbastanza basilare, ma con evidenti limiti quando la complessit\`{a} delle matrici aumenta e con la completa incapacit\`{a} di questultimo in presenza di "salite/discese" o "tunnel" (vedi \autoref{sec:riflessioni}).
 In conclusione il QLearning si mostra si, un ottimo punto di partenza per studiare il RL, ma presenta evidenti limiti a risolvere questa tipologia di problemi.
