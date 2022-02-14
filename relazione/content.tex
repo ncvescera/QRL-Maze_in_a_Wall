@@ -1,4 +1,3 @@
-% TODO: provare a rendere indivisibili i listing con \begin{minipage}{\linewidth}
 \section{Obiettivo}
 % TODO: rivedere meglio, suona strano
 L'obiettivo di questa relazione \`{e} quello di realizzare un'implementazione di un \textbf{ambiente} di \textbf{Reinforcement Learning} per allenare un agente, tramite un algoritmo di \textbf{Q-Learning}, a muoversi in modo "\textit{intelligente}" all'interno di un labirinto, ovvero l'agente deve essere in grado di non andare a sbattere contro le mura del labirinto e possibilmente arrivare all'uscita.
@@ -195,8 +194,8 @@ I labirinti \ref{lst:valido1} e \ref{lst:valido2} risultano validi in quanto l'a
 All'interno di questo file sono presenti alcune funzioni "\textit{utilities}" per la generazione, controllo e caricamento dei labirinti. 
 
 \subsubsection{is\_solvable}
-\`{E} proprio qui che le varie matrici vengono controllate e ottengono lo stato di \textit{valide/risolvibili} (\textit{solvable}).  % TODO: controllare se le successive righe sono cazzate (esplorazione in profondita')
-Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) che percorre tutto il labirinto e ritorna \lstinline[style=cmd]|True| se l'agente riesce ad arrivare allo stato goal, altrimenti \lstinline[style=cmd]|False|. Questo controllo non intacca di molto le performance dell'algoritmo in quanto anche su matrici $10 \times 10$ il suo tempo di completamento non \`{e} minimamente rilevante: %confronto la fase di training o testing. % TODO: ricontrollare meglio e ampliare un po con anche il O(n).
+\`{E} proprio qui che le varie matrici vengono controllate e ottengono lo stato di \textit{valide/risolvibili} (\textit{solvable}). 
+Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) che percorre tutto il labirinto e ritorna \lstinline[style=cmd]|True| se l'agente riesce ad arrivare allo stato goal, altrimenti \lstinline[style=cmd]|False|. Questo controllo non intacca di molto le performance dell'algoritmo in quanto anche su matrici $10 \times 10$ il suo tempo di completamento non \`{e} minimamente rilevante: 
 
 \begin{figure}[H]
 	\centering
@@ -208,8 +207,7 @@ Questo controllo viene fatto tramite un'esplorazione in ampiezza (\textit{BFS}) 
 	\caption{Tempi di esecuzione della funzione \lstinline[style=cmd]|is_solvable()| con matrici di diversa dimensione.}
 \end{figure}
 
-% TODO: ricontrollare
-Il costo in tempo \`{e} $O(m \times n)$:
+Il costo in tempo \`{e} $O(mn)$:
 
 \begin{center}
 	$Tcosto = O(V + E) = O(mn + mn - n + mn - m) = O(3mn - m - n) = O(mn) $
@@ -771,7 +769,6 @@ Infine \`{e} doveroso notare che non tutti gli stati di questa matrice saranno u
 Questo metodo si occupa della gestione della fase di \textit{training}. \`{E} possibile specificare i parametri di allenamento oppure verranno utilizzati quelli di default:
 
 \begin{itemize}
-	% TODO: descrivere meglio i parametri
 	\item \textbf{epochs}: numero di volte che andr\`{a} ad analizzare il labirinto
 	\item \textbf{steps}: massimo numero di azioni che l'agente pu\`{o} compiere per epoca
 	\item \textbf{alpha}: learning rate
@@ -1475,7 +1472,7 @@ Grazie alle modifiche apportate in \autoref{sec:problema2} l'agente sa affrontar
 \end{itemize}
 
 Prendiamo, per esempio, la seguente situazione: tra l'agente ed il goal ci sono 4 stati a lui sconosciuti e che la sequenza di azioni giusta da scegliere sia \lstinline[style=cmd]|R, R, R, R|. La probabilit\`{a} che scelga la giusta combinazione di azioni \`{e} data da:
-% TODO: ricontrollare i calcoli
+
 \[\frac{1}{4} * \frac{1}{4} * \frac{1}{4} * \frac{1}{4} = {\frac{1}{4}}^4 = \frac{1}{64} = 0.015 = 1.5\%\]
 
 La probabilit\`{a} di superare con successo 4 stati inesplorati consecutivi \`{e} estremamente bassa ! Le modifiche apportate alla funzione \lstinline[style=cmd]|maxAction()| servono per gestire stati inesplorati isolati e impedire all'agetne di bloccarsi, ma quando abbiamo troppi stati inesplorati consecutivi (gi\`{a} 4 risultano eccessivi)  queste non possono fare molto.
@@ -1528,7 +1525,6 @@ Lo stesso discorso vale anche per pattern di mura del tipo: "tunnel a destra" e 
 
 \section{Conclusioni}
 
-% TODO: aggiungere ref alle parole allenamenti
 % TODO:rileggere meglio
 Dopo aver eseguito un primo allenamento iniziale, aver preso visione e corretto i vari problemi con i successivi due allenamenti, aver confrontato le performance dell'agente per oguno di questi, posso concoludere che, tramite QLearning, sono riuscito a far apprendere all'agente come evadere da labirinti di modeste dimensioni e con una disposizione delle mura abbastanza basilare, ma con evidenti limiti quando la complessit\`{a} delle matrici aumenta e con la completa incapacit\`{a} di questultimo in presenza di "salite/discese" o "tunnel" (vedi \autoref{sec:riflessioni}).
 In conclusione il QLearning si mostra si, un ottimo punto di partenza per studiare il RL, ma presenta evidenti limiti a risolvere questa tipologia di problemi.
