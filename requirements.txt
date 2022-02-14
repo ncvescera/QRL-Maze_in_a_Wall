@@ -1,2 +1,2 @@
-gym
-stable-baselines3
+numpy
+pygame
