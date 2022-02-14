@@ -257,7 +257,7 @@ Anche il costo in spazio \`{e} identico in quanto la lista \lstinline[style=cmd]
 	
 		return False
 \end{lstlisting}
-
+\pagebreak
 \subsubsection{grid\_from\_file}
 La funzione che si occupa di caricare in memoria un labirinto da file risulta essere abbastanza banale: tenta di aprire il file \lstinline[style=cmd]|maze.txt|, se non esiste o il suo contenuto \`{e} errato o il labirinto al suo interno non \`{e} risolvibile ritorna \lstinline[style=cmd]|None| ed un messaggio di errore, altrimenti ritorna la matrice sotto forma di \lstinline[style=cmd]|numpy.ndarray|.
 
@@ -291,7 +291,7 @@ La funzione \lstinline[style=cmd]|generate_grid| riesce a creare labirinti, di d
 \[maxWalls = \frac{m * n}{2}\]
 
 Superando $maxWalls$ si potranno andare a generare barriere  di mura insuperabili dall'agente, ma restando sotto questo limite \`{e} sempre certo che questo fenomeno non accadr\`{a} mai.
-
+\pagebreak
 \begin{lstlisting}[style=python, caption={Funzione per la generazione di labirinti casuali}]
 	def generate_grid(m, n, walls=10) -> np.ndarray:
 		if walls >= (m * n / 2):
@@ -339,7 +339,7 @@ class MazeEnv(object):
 \end{lstlisting}
 
 Il precedente \`{e} un breve sunto di tutti i metodi presenti all'interno della classe \lstinline[style=cmd]|MazeEnv|. In questa sezione andremo ad analizzare solo quelli pi\`{u} importanti e significativi per ovvie ragioni di spazio e tempo.
-
+\pagebreak
 \subsubsection{Costruttore}
 
 \begin{lstlisting}[style=python, caption={Costruttore di MazeEnv.py}]
@@ -487,7 +487,7 @@ Le \textit{posizione} dell'agente non \`{e} data dalla normale coppia \lstinline
 Cos\`{i} facendo, operazioni come controllare se l'agente tenta di uscire dalla matrice risulteranno molto pi\`{u} semplici da implementare. \`{E} altres\`{i} facile ottenere le coordinate \lstinline[style=cmd]|(x, y)| partendo dall'identificativo della calla (vedi \autoref{sec:inttoxy}).\\
 
 Il dizionario \lstinline[style=cmd]|actionSpace| rappresenta tutte le possibili azioni che l'agente pu\`{o} compiere con il relativo valore da aggiungere alla sua attuale posizione (identificativo univoco della cella) per raggiungere la nuova. Per esempio, tenendo in considerazione la \autoref{fig:matricearray}, se dalla cella 0 volessimo eseguire l'azione \lstinline[style=cmd]|D|, dobbiamo effettuare il seguente calcolo: $0 + n = 0 + 3 = 3$. Ovviamente azioni come: dalla cella 2 eseguo l'azione \lstinline[style=cmd]|R|, non saranno permesse per i vincoli descritti prima (vedi \autoref{sec:vincoliambiente}).
-
+\pagebreak
 \subsubsection{get\_agent\_row\_column}
 \label{sec:inttoxy}
 
@@ -596,7 +596,7 @@ def off_grid_move(self, new_cell: int) -> bool:
 	else:
 		return False
 \end{lstlisting}
-
+\pagebreak
 \subsubsection{state\_to\_int}
 \label{sec:statetoint}
 
@@ -986,7 +986,7 @@ for file in filenames:
 	)
 	
 \end{lstlisting}
-
+\pagebreak
 \subsection{testing.py}
 \label{sec:testing}
 
@@ -1054,10 +1054,9 @@ Ho quindi deciso di allenare l'agente con i seguenti parametri:
 \begin{figure}[H]
 	\centering
 	\begin{tabular}{c | c | c | c | c}
-		\textbf{Epoche}: 50k & \textbf{Step}: 400 & \textbf{Alpha}: 0.1 & \textbf{Gamma}: 1.0 & \textbf{EPS}: 0.9\\
+		\textbf{Epoche}: 50k & \textbf{Step}: 400 & \textbf{Alpha}: 0.1 & \textbf{Gamma}: 1.0 & \textbf{EPS}: 0.9
 	\end{tabular}
 \end{figure}
-
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.6\textwidth]{img/primo_allenamento.png}
@@ -1270,7 +1269,7 @@ Successivamente vado prima a testarlo sul labirinto con cui \`{e} stato allenato
 \end{figure}
 
 Dall'analisi dei risultati sopra mostrati, si pu\`{o} notare come l'agente risulta essere molto bravo a risolvere il labirinto su cui \`{e} stato allenato (c), ma appena viene messo all'interno di uno mai esplorato non sa come comportarsi: in (d) si vede come quest'ultimo sta procedendo in modo casuale sperando di arrivare, prima o poi, in una serie di stati conosciuti che lo porteranno al goal. Anche il risultato della valutazione generale (mostrata in (b)) \`{e} molto scadente: l'agente riesce, in media, a risolvere solo 2 labirinti tra i 20 presenti nel dataset di testing.%una media dei reward totali e della precisione estremamente bassa.
-
+\pagebreak
 \subsubsection{Problema 1}
 \label{sec:problema11}
 
