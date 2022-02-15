@@ -1,5 +1,5 @@
 \section{Obiettivo}
-% TODO: rivedere meglio, suona strano
+
 L'obiettivo di questa relazione \`{e} quello di realizzare un'implementazione di un \textbf{ambiente} di \textbf{Reinforcement Learning} per allenare un agente, tramite un algoritmo di \textbf{Q-Learning}, a muoversi in modo "\textit{intelligente}" all'interno di un labirinto, ovvero l'agente deve essere in grado di non andare a sbattere contro le mura del labirinto e possibilmente arrivare all'uscita.
 
 \section{Ipotesi iniziali e vincoli}
@@ -676,7 +676,7 @@ def calculate_next_state(self, action, next_position) -> int:
 \end{lstlisting}
 
 \subsubsection{step}
-Questo \`{e} il metodo vero e proprio che segue una data azione. Calcola la nuova cella (id) in cui l'agente si trover\`{a}, verifica la validit\`{a} della mossa e calcola il nuovo stato dell'agente (righe 1 - 4) ritornando l'osservazione, il reward ed alcune info utili per il debug (riga 10).\\
+Questo \`{e} il metodo vero e proprio che esegue una data azione. Calcola la nuova cella (id) in cui l'agente si trover\`{a}, verifica la validit\`{a} della mossa e calcola il nuovo stato dell'agente (righe 1 - 4) ritornando l'osservazione, il reward ed alcune info utili per il debug (riga 10).\\
 
 \begin{lstlisting}[style=python, caption={Codice del metodo step}]
 def step(self, action: str) -> tuple[int, int, bool, object]:
@@ -1525,6 +1525,5 @@ Lo stesso discorso vale anche per pattern di mura del tipo: "tunnel a destra" e 
 
 \section{Conclusioni}
 
-% TODO:rileggere meglio
 Dopo aver eseguito un primo allenamento iniziale, aver preso visione e corretto i vari problemi con i successivi due allenamenti, aver confrontato le performance dell'agente per oguno di questi, posso concoludere che, tramite QLearning, sono riuscito a far apprendere all'agente come evadere da labirinti di modeste dimensioni e con una disposizione delle mura abbastanza basilare, ma con evidenti limiti quando la complessit\`{a} delle matrici aumenta e con la completa incapacit\`{a} di questultimo in presenza di "salite/discese" o "tunnel" (vedi \autoref{sec:riflessioni}).
 In conclusione il QLearning si mostra si, un ottimo punto di partenza per studiare il RL, ma presenta evidenti limiti a risolvere questa tipologia di problemi.
